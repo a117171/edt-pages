@@ -3485,7 +3485,8 @@ async function testCloudflareConfig() {
         if (data.success) {
             // 验证成功
             statusEl.style.background = 'linear-gradient(135deg, #10b981 0, #059669 100%)';
-            statusEl.textContent = `✅ 验证成功！Pages: ${data.pages}, Workers: ${data.workers}, 总计: ${data.total}`;
+            const percentage = (data.total/100000 * 100).toFixed(2);
+            statusEl.textContent = `✅ 验证成功！ 今天的请求配额: ${data.total}/100000 (${percentage}%)`;
             confirmBtn.disabled = false;
             confirmBtn.style.opacity = '1';
             confirmBtn.dataset.testPassed = 'true';
