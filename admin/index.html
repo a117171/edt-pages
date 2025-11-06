@@ -1607,6 +1607,137 @@
             background: linear-gradient(135deg, #d1d5db 0, #b3b8be 100%);
         }
 
+        .btn-proxyip-help {
+            background: linear-gradient(135deg, #10b981 0, #059669 100%);
+            color: #fff !important;
+            padding: 10px 16px;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-proxyip-help:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-proxyip-help:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+        }
+
+        .proxyip-help-modal {
+            max-width: 1200px;
+            width: 90vw;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .api-docs {
+            text-align: left;
+        }
+
+        .api-docs h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+
+        .api-docs h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 20px 0 12px;
+        }
+
+        .api-docs p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .api-docs a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .api-docs a:hover {
+            text-decoration: underline;
+        }
+
+        .code-block {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 12px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: 'Monaco', 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .simple-explanation {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+            padding: 16px;
+            border-radius: 4px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .toggle-switch label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 600;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html.dark-mode .code-block {
+            background: #2a2a2a;
+            color: #ffd699;
+            border-left-color: #ffc107;
+        }
+
+        html.dark-mode .simple-explanation {
+            background: #1b4620;
+            color: #81c784;
+            border-left-color: #4caf50;
+        }
+
+        html.dark-mode .btn-proxyip-help {
+            background: linear-gradient(135deg, #10b981 0, #059669 100%);
+            color: #fff !important;
+        }
+
+        html.dark-mode .btn-proxyip-help:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+        }
+
         html.dark-mode .api-optimize-modal {
             background: var(--bg-secondary);
             color: var(--text-primary);
@@ -3380,6 +3511,10 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
                     </div>
 
                     <div class="module-footer">
+                        <button type="button" class="btn btn-proxyip-help" onclick="showProxyIPHelpModal()"
+                            title="了解 ProxyIP 的相关信息">
+                            💡 为什么需要反代模式？PROXYIP又是什么？
+                        </button>
                         <div class="btn-group">
                             <button type="button" class="btn btn-secondary" onclick="cancelEdit('proxy')" disabled
                                 id="cancelProxyBtn">取消</button>
@@ -3693,7 +3828,8 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
                 <div class="form-group subapi-form-group">
                     <label>API Token</label>
                     <input type="password" id="cloudflareAPIToken" placeholder="输入API Token">
-                    <small style="font-size: 12px; color: #9ca3af; margin-top: 6px; display: block;">💡 API令牌权限 使用 "阅读分析数据和日志" 模板即可</small>
+                    <small style="font-size: 12px; color: #9ca3af; margin-top: 6px; display: block;">💡 API令牌权限 使用
+                        "阅读分析数据和日志" 模板即可</small>
                 </div>
             </div>
 
@@ -3825,6 +3961,118 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
                     onclick="appendResultsToCustom()" disabled>追加结果</button>
                 <button type="button" class="btn btn-close-api" onclick="closeAPIOptimizeModal()">关闭</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ProxyIP 帮助科普弹窗 -->
+    <div class="modal-overlay" id="proxyIPHelpModal" onclick="closeProxyIPHelpModal(event)">
+        <div class="modal proxyip-help-modal" onclick="event.stopPropagation()">
+            <button type="button" class="modal-close" onclick="closeProxyIPHelpModal()">×</button>
+
+            <!-- 简易模式 -->
+            <div id="proxyIPHelpSimple" style="display: none;">
+                <div class="api-docs">
+                    <h2 class="section-title">🤔 为什么需要反代模式？PROXYIP又是什么？</h2>
+
+                    <div class="simple-explanation">
+                        <strong>用最简单的话解释：</strong><br><br>
+                        
+                        <strong>🚀 问题是这样的：</strong><br>
+                        我们的 edgetunnel 服务部署在 Cloudflare Workers 上。但是 Cloudflare 有个限制——他们的 Workers 无法直接访问 Cloudflare 自己的服务。<br><b>这就像名叫 Cloudflare 的小白永远无法从自己的眼睛里看到自己。</b><br><br>
+                        
+                        <strong>💡 解决方案：</strong><br>
+                        为了解决这个问题，我们需要借助外部服务器（ProxyIP、SOCKS5 或 HTTP）作为「跳板」，通过这些第三方服务器来代理访问 Cloudflare 的服务。<br><b>相当于找了一面（ProxyIP/SOCKS5/HTTP）镜子，这样 Cloudflare 就能通过镜子看到了自己。</b><br><br>
+                        
+                        <strong>📍 实际效果：</strong>
+                        <ul style="margin: 12px 0 0 20px; padding-left: 0;">
+                            <li style="margin-bottom: 8px;">👤 访问<strong>非 Cloudflare CDN 的网站</strong>时（如<b>油管、谷歌</b>等），你的 IP 由「优选 IP」决定</li>
+                            <li>🌐 访问<strong>由 Cloudflare CDN 托管的网站</strong>时（如<b>推特、ChatGPT</b>等），你的 IP 由「反代模式（PROXYIP/SOCKS5/HTTP）」决定</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 详细模式 -->
+            <div id="proxyIPHelpDetail" style="display: block;">
+                <div class="api-docs">
+                    <h2 class="section-title">🤔 为什么需要反代模式？PROXYIP又是什么？</h2>
+                    <h3 style="color: var(--text-primary); margin: 24px 0 16px;">❓ 为什么需要反代模式？</h3>
+                    <p style="margin-bottom: 16px; line-height: 1.8; color: var(--text-secondary);">
+                        根据 Cloudflare Workers 的 <a
+                            href="https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/" target="_blank"
+                            rel="noopener" style="color: var(--primary-color); text-decoration: none;">TCP Sockets
+                            官方文档</a> 说明，存在以下技术限制：
+                    </p>
+                    <div class="code-block">
+                        ⚠️ Outbound TCP sockets to <a href="https://www.cloudflare.com/ips/" target="_blank"
+                            rel="noopener" style="color: inherit; text-decoration: underline;">Cloudflare IP ranges
+                            ↗</a> are temporarily blocked, but will be re-enabled shortly.
+                    </div>
+
+                    <p style="margin: 16px 0; line-height: 1.8; color: var(--text-secondary);">
+                        这意味着 Cloudflare Workers 无法直接连接到 Cloudflare 自有的 IP 地址段。为了解决这个限制，需要借助第三方云服务商的服务器作为「跳板」：
+                    </p>
+
+                    <p style="margin-bottom: 16px; line-height: 1.8; color: var(--text-secondary);">
+                        而我们的 <b>edgetunnel</b> 是部署在 Cloudflare Workers 上的代理服务。根据 Cloudflare Workers 的限制政策，Workers 节点无法直接连接到
+                        Cloudflare 自有的 IP 地址段。这意味着：
+                    </p>
+                    <ul style="margin: 12px 0 16px; padding-left: 20px; line-height: 1.8;">
+                        <li style="margin-bottom: 8px; color: var(--text-secondary);">✅ 可以正常访问非 Cloudflare CDN 的站点</li>
+                        <li style="color: var(--text-secondary);">❌ 无法直接访问由 Cloudflare CDN 托管的网站</li>
+                    </ul>
+                    <p style="margin-bottom: 16px; line-height: 1.8; color: var(--text-secondary);">
+                        因此需要反代模式来解决这个问题。反代模式通过第三方服务器作为「中介」，帮助 Workers 绕过这一限制。
+                    </p>
+
+                    <div
+                        style="background: var(--bg-secondary); padding: 20px; border-radius: var(--border-radius-sm); margin: 20px 0;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+                            <div
+                                style="background: #e3f2fd; padding: 12px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px;">
+                                <div style="font-weight: 600; color: #1976d2;">Cloudflare Workers</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">发起请求</div>
+                            </div>
+                            <div style="color: var(--primary-color); font-size: 1.5rem;">→</div>
+                            <div
+                                style="background: #f3e5f5; padding: 12px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px;">
+                                <div style="font-weight: 600; color: #7b1fa2;">PROXYIP/SOCKS5/HTTP 服务器</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">第三方代理</div>
+                            </div>
+                            <div style="color: var(--primary-color); font-size: 1.5rem;">→</div>
+                            <div
+                                style="background: #e8f5e8; padding: 12px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px;">
+                                <div style="font-weight: 600; color: #388e3c;">Cloudflare 服务</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">目标服务</div>
+                            </div>
+                        </div>
+                        <p style="text-align: center; color: var(--text-secondary); font-size: 0.95rem; margin: 0;">
+                            通过第三方服务器反向代理 Cloudflare 的 443 端口，实现 Workers 对 Cloudflare 服务的访问
+                        </p>
+                    </div>
+
+                    <h3 style="color: var(--text-primary); margin: 24px 0 16px;">💡 实际应用效果</h3>
+                    <p style="margin-bottom: 16px; line-height: 1.8; color: var(--text-secondary);">
+                        因此，你访问网络时的 IP 归属地取决于访问的目标网站类型：
+                    </p>
+                    <ul style="margin: 12px 0; padding-left: 20px; line-height: 1.8;">
+                        <li style="margin-bottom: 12px; color: var(--text-secondary);">👤 访问<strong>非 Cloudflare CDN
+                                站点</strong>时（如<b>油管、谷歌</b>等），你的 IP 归属地由「优选 IP」决定</li>
+                        <li style="color: var(--text-secondary);">🌐 访问<strong>由 Cloudflare CDN 托管的网站</strong>时（如<b>推特、ChatGPT</b>等），你的 IP
+                            归属地由「ProxyIP/SOCKS5/HTTP」决定</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 切换按钮 -->
+            <div class="toggle-switch">
+                <input type="checkbox" id="proxyIPSimpleMode" onchange="toggleProxyIPHelpMode()">
+                <label for="proxyIPSimpleMode">我是小白，我看不懂</label>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-close-modal" onclick="closeProxyIPHelpModal()"
+                style="margin-top: 20px;">关闭</button>
         </div>
     </div>
 
@@ -4933,6 +5181,32 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
             document.getElementById('subAPIModal').classList.remove('show');
             document.getElementById('testSubAPIInput').value = '';
             document.getElementById('subAPIStatus').style.display = 'none';
+        }
+
+        // ProxyIP 帮助模态框函数
+        function showProxyIPHelpModal() {
+            document.getElementById('proxyIPHelpModal').classList.add('show');
+        }
+
+        function closeProxyIPHelpModal(event) {
+            if (event && event.target.id !== 'proxyIPHelpModal') return;
+            document.getElementById('proxyIPHelpModal').classList.remove('show');
+        }
+
+        function toggleProxyIPHelpMode() {
+            const checkbox = document.getElementById('proxyIPSimpleMode');
+            const simpleDiv = document.getElementById('proxyIPHelpSimple');
+            const detailDiv = document.getElementById('proxyIPHelpDetail');
+
+            if (checkbox.checked) {
+                // 显示简易模式
+                simpleDiv.style.display = 'block';
+                detailDiv.style.display = 'none';
+            } else {
+                // 显示详细模式
+                simpleDiv.style.display = 'none';
+                detailDiv.style.display = 'block';
+            }
         }
 
         function normalizeSubAPIURL(url) {
