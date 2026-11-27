@@ -1778,10 +1778,6 @@
 			line-height: 1.7;
 		}
 
-		#qrcodeModal .modal {
-			background: #808080;
-		}
-
 		.modal-close {
 			position: absolute;
 			top: 15px;
@@ -1994,6 +1990,8 @@
 			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
 			-webkit-user-select: none;
 			user-select: none;
+			/* 移动端长按不要弹 iOS 的链接预览/气泡（Android 的菜单由 JS 拦 contextmenu） */
+			-webkit-touch-callout: none;
 		}
 
 		.social-link::before {
@@ -2168,303 +2166,927 @@
 			box-shadow: 0 0 0 1px rgba(147, 51, 234, 0.2), 0 2px 8px rgba(147, 51, 234, 0.18);
 		}
 
-		.version-info-modal {
-			max-width: 520px;
+		/* ============================================================
+		   版本弹窗（关于 edgetunnel / 更新日志）
+		   样式令牌只作用于这两个弹窗，不污染其它 modal
+		   ============================================================ */
+		.version-info-modal,
+		.version-changelog-modal {
+			--vp-surface: #ffffff;
+			--vp-surface-2: #f8fafc;
+			--vp-surface-3: #eef3f9;
+			--vp-ink-1: #0f172a;
+			--vp-ink-2: #4b5768;
+			--vp-ink-3: #94a3b8;
+			--vp-line: #e6ecf4;
+			--vp-line-2: #d5dfea;
+			--vp-tl: #c6d2e0;
+			--vp-pill-bg: #101828;
+			--vp-pill-ink: #ffffff;
+			--vp-ok: #0d9b72;
+			--vp-ok-soft: rgba(16, 185, 129, 0.10);
+			--vp-ok-line: rgba(16, 185, 129, 0.30);
+			--vp-warn: #b9720b;
+			--vp-warn-soft: rgba(245, 158, 11, 0.11);
+			--vp-warn-line: rgba(245, 158, 11, 0.32);
+			--vp-violet: #7c3aed;
+			--vp-violet-soft: rgba(147, 51, 234, 0.10);
+			--vp-violet-line: rgba(147, 51, 234, 0.28);
+			--vp-blue: #2563eb;
+			--vp-del-line: rgba(138, 112, 88, 0.58);
+			--vp-dep-accent: #d96a00;
+			--vp-dep-bg: #fcfdff;
+			--vp-dep-bg-h: #fffaf6;
+			--vp-dep-line: #dde5ef;
+			--vp-dep-ic-a: rgba(250, 171, 65, 0.20);
+			--vp-dep-ic-b: rgba(246, 130, 31, 0.09);
+			--vp-dep-ic-line: rgba(246, 130, 31, 0.22);
+			--vp-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', monospace;
+		}
+
+		/* 外壳几何用 .modal.* 提高权重：页面通用 .modal 在移动端有 padding/width 覆盖，这里要压住 */
+		.modal.version-info-modal,
+		.modal.version-changelog-modal {
+			position: relative;
+			background: var(--vp-surface);
+			color: var(--vp-ink-1);
+			border: 1px solid rgba(15, 23, 42, 0.07);
+			border-radius: 18px;
+			box-shadow: 0 28px 64px -28px rgba(15, 23, 42, 0.34), 0 2px 8px rgba(15, 23, 42, 0.05);
 			text-align: left;
+			/* overflow: hidden 裁切 ::before 顶条沿 17px 内圆角，修复圆角穿模；与移动端 .modal overflow-y:auto 行为一致 */
+			overflow: hidden;
+		}
+
+		/* 顶部品牌渐变细线，呼应页头 header 的 border-image */
+		.version-info-modal::before,
+		.version-changelog-modal::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			height: 3px;
+			border-radius: 18px 18px 0 0;
+			background: linear-gradient(90deg, #faab41, #f6821f 50%, #faab41);
+			opacity: 0.9;
+			pointer-events: none;
+		}
+
+		.modal.version-info-modal {
+			width: min(560px, calc(100vw - 32px));
+			max-width: 560px;
+			padding: 26px 28px 16px;
+		}
+
+		/* ---------- 弹窗头部 ---------- */
+		.version-modal-hd {
+			display: flex;
+			align-items: flex-start;
+			gap: 13px;
+			padding: 0 34px 16px 0;
+			margin: 0 0 18px;
+			border-bottom: 1px solid var(--vp-line);
+		}
+
+		.version-modal-hd-ic {
+			flex: 0 0 44px;
+			width: 44px;
+			height: 44px;
+			border-radius: 13px;
+			display: grid;
+			place-items: center;
+			background: linear-gradient(135deg, #faab41, #f6821f);
+			box-shadow: 0 10px 22px -10px rgba(246, 130, 31, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+			font-size: 21px;
+			line-height: 1;
+		}
+
+		.version-modal-hd-tx {
+			display: block;
+			min-width: 0;
+			flex: 1;
+			padding-top: 1px;
 		}
 
 		.version-info-title {
-			margin: 0 0 14px;
-			font-size: 24px;
+			margin: 0;
+			font-size: 20px;
 			font-weight: 700;
-			color: #111827;
+			letter-spacing: -0.01em;
+			line-height: 1.25;
+			color: var(--vp-ink-1);
 		}
 
+		.version-modal-hd-sub {
+			margin: 4px 0 0;
+			font-size: 12.5px;
+			font-weight: 400;
+			line-height: 1.4;
+			color: var(--vp-ink-3);
+		}
+
+		/* 页面通用 .modal h2 在移动端带 margin-bottom:14px !important，这里按作用域压回 0 */
+		.version-modal-hd .version-info-title {
+			margin: 0 !important;
+		}
+
+		/* 关闭按钮：作用域覆盖通用 .modal-close，不改通用规则 */
+		.version-info-modal .modal-close,
+		.version-changelog-modal .modal-close {
+			top: 22px;
+			right: 22px;
+			width: 30px;
+			height: 30px;
+			border-radius: 9px;
+			border: 1px solid transparent;
+			background: transparent;
+			color: var(--vp-ink-3);
+			font-size: 17px;
+			line-height: 1;
+			display: grid;
+			place-items: center;
+			transition: background 0.16s, color 0.16s, border-color 0.16s;
+		}
+
+		.version-info-modal .modal-close:hover,
+		.version-changelog-modal .modal-close:hover {
+			background: var(--vp-surface-3);
+			color: var(--vp-ink-1);
+			border-color: var(--vp-line);
+		}
+
+		/* ---------- 版本对比：当前 → 最新 ---------- */
 		.version-info-summary {
+			position: relative;
 			margin: 0;
-			display: flex;
-			flex-direction: column;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+			align-items: center;
 			gap: 10px;
-			padding: 14px 16px;
-			border-radius: 12px;
-			background: linear-gradient(135deg, rgba(148, 163, 184, 0.08) 0%, rgba(100, 116, 139, 0.06) 100%);
-			border: 1px solid rgba(148, 163, 184, 0.22);
-			color: #374151;
-			font-size: 15px;
+			padding: 16px 18px 14px;
+			border-radius: 14px;
+			background: var(--vp-surface-2);
+			border: 1px solid var(--vp-line);
+			border-left: 3px solid var(--vp-line-2);
+			color: var(--vp-ink-2);
+			font-size: 13px;
 			line-height: 1.6;
+			overflow: hidden;
+		}
+
+		.version-info-summary::after {
+			content: '';
+			position: absolute;
+			right: -40px;
+			top: -60px;
+			width: 180px;
+			height: 180px;
+			border-radius: 50%;
+			background: radial-gradient(closest-side, rgba(148, 163, 184, 0.16), transparent);
+			pointer-events: none;
 		}
 
 		.version-info-summary.state-latest {
-			background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
-			border-color: rgba(16, 185, 129, 0.34);
+			border-left-color: var(--vp-ok);
+			background: linear-gradient(100deg, var(--vp-ok-soft), transparent 55%), var(--vp-surface-2);
 		}
 
 		.version-info-summary.state-outdated {
-			background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%);
-			border-color: rgba(245, 158, 11, 0.34);
+			border-left-color: var(--vp-warn);
+			background: linear-gradient(100deg, var(--vp-warn-soft), transparent 55%), var(--vp-surface-2);
 		}
 
 		.version-info-summary.state-preview {
-			background: linear-gradient(135deg, rgba(147, 51, 234, 0.12) 0%, rgba(126, 34, 206, 0.08) 100%);
-			border-color: rgba(147, 51, 234, 0.34);
-		}
-
-		.version-info-summary strong {
-			color: #111827;
-			font-weight: 700;
-		}
-
-		.version-info-summary p {
-			margin: 0;
+			border-left-color: var(--vp-violet);
+			background: linear-gradient(100deg, var(--vp-violet-soft), transparent 55%), var(--vp-surface-2);
 		}
 
 		.version-info-line {
+			position: relative;
+			z-index: 1;
+			margin: 0;
+			min-width: 0;
 			display: flex;
-			align-items: center;
-			gap: 8px;
-			flex-wrap: wrap;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 6px;
+		}
+
+		.version-info-summary strong.version-info-k {
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.07em;
+			text-transform: uppercase;
+			line-height: 1.3;
+			color: var(--vp-ink-3);
+		}
+
+		.version-info-v {
+			font-family: var(--vp-mono);
+			font-size: 15.5px;
+			font-weight: 700;
+			letter-spacing: -0.02em;
+			line-height: 1.25;
+			color: var(--vp-ink-1);
+			white-space: nowrap;
+			max-width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		/* 线上版本号 19 位（v2.1.20260410060317）：弹窗窄于 560px 时两列放不下，先降字号避免贴边 */
+		@media (max-width: 560px) {
+			.version-info-v {
+				font-size: 14px;
+			}
+		}
+
+		.version-info-arrow {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			place-items: center;
+			color: var(--vp-ink-3);
+			opacity: 0.75;
+		}
+
+		.version-info-arrow svg {
+			display: block;
+			width: 18px;
+			height: 18px;
 		}
 
 		.version-state-tip {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			padding: 2px 8px;
+			padding: 2.5px 8px;
 			border-radius: 999px;
-			font-size: 12px;
+			font-size: 11px;
 			font-weight: 700;
-			line-height: 1.35;
+			line-height: 1.4;
 			border: 1px solid transparent;
+			white-space: nowrap;
 		}
 
 		.version-state-tip.is-latest {
-			color: #065f46;
-			background: rgba(16, 185, 129, 0.16);
-			border-color: rgba(16, 185, 129, 0.4);
+			color: var(--vp-ok);
+			background: var(--vp-ok-soft);
+			border-color: var(--vp-ok-line);
 		}
 
 		.version-state-tip.is-outdated {
-			color: #92400e;
-			background: rgba(245, 158, 11, 0.16);
-			border-color: rgba(245, 158, 11, 0.4);
+			color: var(--vp-warn);
+			background: var(--vp-warn-soft);
+			border-color: var(--vp-warn-line);
 		}
 
 		.version-state-tip.is-preview {
-			color: #6b21a8;
-			background: rgba(147, 51, 234, 0.16);
-			border-color: rgba(147, 51, 234, 0.4);
+			color: var(--vp-violet);
+			background: var(--vp-violet-soft);
+			border-color: var(--vp-violet-line);
 		}
 
+		/* 状态提示语：纯 CSS 依据 .state-* 切换三条文案 */
+		.version-info-hint {
+			position: relative;
+			z-index: 1;
+			grid-column: 1 / -1;
+			margin-top: 13px;
+			padding-top: 12px;
+			border-top: 1px dashed var(--vp-line);
+			font-size: 12px;
+			line-height: 1.55;
+			color: var(--vp-ink-2);
+		}
+
+		.version-hint-item {
+			display: none;
+			align-items: flex-start;
+			gap: 7px;
+		}
+
+		.version-hint-item i {
+			flex: 0 0 14px;
+			width: 14px;
+			height: 14px;
+			margin-top: 1px;
+			border-radius: 50%;
+			display: grid;
+			place-items: center;
+			color: #fff;
+		}
+
+		.version-hint-item i svg {
+			display: block;
+			width: 9px;
+			height: 9px;
+		}
+
+		.version-hint-item.version-hint-outdated i {
+			background: var(--vp-warn);
+		}
+
+		.version-hint-item.version-hint-latest i {
+			background: var(--vp-ok);
+		}
+
+		.version-hint-item.version-hint-preview i {
+			background: var(--vp-violet);
+		}
+
+		.version-info-summary.state-outdated .version-hint-outdated {
+			display: flex;
+		}
+
+		.version-info-summary.state-latest .version-hint-latest {
+			display: flex;
+		}
+
+		.version-info-summary.state-preview .version-hint-preview {
+			display: flex;
+		}
+
+		/* ---------- 动作区：两种部署方式完全等权 ---------- */
 		.version-info-actions {
-			margin-top: 16px;
+			margin-top: 18px;
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
 		}
 
-		.version-info-actions .btn {
+		.version-deploy-label {
+			display: flex;
+			align-items: center;
+			gap: 9px;
+			margin: 0;
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.09em;
+			line-height: 1.3;
+			text-transform: uppercase;
+			color: var(--vp-ink-2);
+		}
+
+		.version-deploy-label::after {
+			content: '';
+			flex: 1;
+			height: 1px;
+			background: linear-gradient(90deg, var(--vp-line), transparent);
+		}
+
+		.version-deploy-list {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 0;
+			border: 1px solid var(--vp-dep-line);
+			border-radius: 13px;
+			overflow: hidden;
+			background: var(--vp-dep-bg);
+			box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+		}
+
+		.version-info-actions .btn-version-copy,
+		.version-info-actions .btn-version-download {
+			display: flex;
+			align-items: center;
+			gap: 11px;
 			width: 100%;
+			padding: 10px 13px;
+			border: 0;
+			border-top: 1px solid var(--vp-dep-line);
+			border-radius: 0;
+			background: transparent;
+			box-shadow: none;
+			font-family: inherit;
+			font-size: 13.5px;
+			font-weight: 400;
+			letter-spacing: 0;
+			line-height: 1.3;
+			color: var(--vp-ink-1);
+			text-align: left;
+			cursor: pointer;
+			transition: background 0.16s ease;
 		}
 
-		.btn-version-copy {
-			background: linear-gradient(135deg, #10b981 0, #059669 100%);
-			color: #fff;
-			box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
-			user-select: none;
-			-webkit-user-select: none;
-			-webkit-touch-callout: none;
+		.version-info-actions .btn-version-copy:first-child {
+			border-top: 0;
 		}
 
-		.btn-version-copy:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 6px 24px rgba(16, 185, 129, 0.42);
+		/* 下载进行中：保留占位，视觉降权，避免重复触发 */
+		.version-info-actions .btn-version-download:disabled {
+			cursor: progress;
+			opacity: 0.6;
 		}
 
-		.btn-version-copy:active {
-			transform: translateY(0);
-			box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+		.version-info-actions .btn-version-copy:hover,
+		.version-info-actions .btn-version-download:hover,
+		.version-info-actions .btn-version-copy:active,
+		.version-info-actions .btn-version-download:active {
+			background: var(--vp-dep-bg-h);
+			box-shadow: none;
+			transform: none;
 		}
 
-		.btn-version-copy.easter-egg-shaking {
-			animation: egg-tremble 0.13s linear infinite;
+		.version-info-actions .btn-version-copy:focus-visible,
+		.version-info-actions .btn-version-download:focus-visible {
+			outline: 2px solid rgba(246, 130, 31, 0.55);
+			outline-offset: -2px;
 		}
 
-		.btn-version-copy.egg-release {
-			animation: egg-release 0.22s ease-out forwards;
+		.version-deploy-ic {
+			flex: 0 0 32px;
+			width: 32px;
+			height: 32px;
+			border-radius: 10px;
+			display: grid;
+			place-items: center;
+			color: var(--vp-dep-accent);
+			background: linear-gradient(135deg, var(--vp-dep-ic-a), var(--vp-dep-ic-b));
+			border: 1px solid var(--vp-dep-ic-line);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 		}
 
-		@keyframes egg-tremble {
-
-			0%,
-			100% {
-				transform: translate(0, 0);
-			}
-
-			25% {
-				transform: translate(-1.5px, 0.5px);
-			}
-
-			50% {
-				transform: translate(1.5px, -0.5px);
-			}
-
-			75% {
-				transform: translate(-1px, 0.5px);
-			}
+		.version-deploy-ic svg {
+			display: block;
+			width: 17px;
+			height: 17px;
 		}
 
-		@keyframes egg-release {
-			0% {
-				transform: scale(1);
-			}
-
-			50% {
-				transform: scale(1.04);
-			}
-
-			100% {
-				transform: scale(1);
-			}
+		.version-deploy-tx {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			min-width: 0;
 		}
 
-		@media (prefers-reduced-motion: reduce) {
-
-			.btn-version-copy.easter-egg-shaking,
-			.btn-version-copy.egg-release {
-				animation: none;
-			}
+		.version-deploy-tx b {
+			font-size: 13.5px;
+			font-weight: 700;
+			line-height: 1.3;
+			letter-spacing: -0.005em;
+			color: var(--vp-ink-1);
 		}
 
-		.btn-version-download {
-			background: linear-gradient(135deg, #3b82f6 0, #2563eb 100%);
-			color: #fff;
-			box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+		.version-deploy-tx small {
+			font-size: 11px;
+			font-weight: 400;
+			line-height: 1.4;
+			letter-spacing: 0.01em;
+			color: var(--vp-ink-3);
 		}
 
-		.btn-version-download:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 6px 24px rgba(59, 130, 246, 0.42);
+		/* 右侧 chevron：暗示"走这条路" */
+		.version-info-actions .btn-version-copy::after,
+		.version-info-actions .btn-version-download::after {
+			content: '';
+			flex: 0 0 8px;
+			width: 8px;
+			height: 8px;
+			margin-left: auto;
+			margin-right: 3px;
+			border-right: 1.7px solid var(--vp-ink-3);
+			border-top: 1.7px solid var(--vp-ink-3);
+			transform: rotate(45deg);
+			opacity: 0.55;
+			transition: border-color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
 		}
 
-		.btn-version-download:active {
-			transform: translateY(0);
-			box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+		.version-info-actions .btn-version-copy:hover::after,
+		.version-info-actions .btn-version-download:hover::after {
+			border-color: var(--vp-dep-accent);
+			opacity: 1;
+			transform: rotate(45deg) translate(2px, -2px);
 		}
 
-		.btn-version-changelog {
-			background: linear-gradient(135deg, #f59e0b 0, #d97706 100%);
-			color: #fff;
-			box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+		/* ---------- 页脚：信息入口 + 关闭 ---------- */
+		.version-info-footer {
+			margin-top: 14px;
+			padding-top: 12px;
+			border-top: 1px solid var(--vp-line);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
 		}
 
-		.btn-version-changelog:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 6px 24px rgba(245, 158, 11, 0.42);
+		.version-info-footer .btn-version-changelog {
+			display: inline-flex;
+			align-items: center;
+			gap: 7px;
+			margin-left: -8px;
+			padding: 6px 8px;
+			border: 0;
+			border-radius: 9px;
+			background: transparent;
+			box-shadow: none;
+			font-size: 12.5px;
+			font-weight: 600;
+			letter-spacing: 0;
+			color: var(--vp-ink-2);
+			cursor: pointer;
+			transition: background 0.16s, color 0.16s;
 		}
 
-		.btn-version-changelog:active {
-			transform: translateY(0);
-			box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+		.version-info-footer .btn-version-changelog svg {
+			width: 15px;
+			height: 15px;
+			flex: 0 0 15px;
+			color: var(--vp-dep-accent);
+			transition: transform 0.16s;
 		}
 
-		.version-changelog-modal {
+		.version-info-footer .btn-version-changelog:hover {
+			background: var(--vp-surface-3);
+			color: var(--vp-ink-1);
+			box-shadow: none;
+			transform: none;
+		}
+
+		.version-info-footer .btn-version-changelog:hover svg {
+			transform: translateX(-1px);
+		}
+
+		.version-info-footer .btn-version-close,
+		.version-changelog-actions .btn-version-close {
+			height: 38px;
+			padding: 0 14px;
+			border: 1px solid transparent;
+			border-radius: 12px;
+			background: transparent;
+			box-shadow: none;
+			font-size: 13px;
+			font-weight: 600;
+			letter-spacing: 0;
+			color: var(--vp-ink-2);
+			cursor: pointer;
+			transition: background 0.16s, color 0.16s;
+		}
+
+		.version-info-footer .btn-version-close:hover,
+		.version-changelog-actions .btn-version-close:hover {
+			background: var(--vp-surface-3);
+			color: var(--vp-ink-1);
+			box-shadow: none;
+			transform: none;
+		}
+
+		/* ============================================================
+		   更新日志弹窗
+		   ============================================================ */
+		.modal.version-changelog-modal {
 			width: min(1120px, 96vw);
 			max-width: 1120px;
-			text-align: left;
+			padding: 24px 26px 18px;
 		}
 
+		.version-changelog-legend {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			padding: 8px 0 2px 26px;
+		}
+
+		/* 图例即跳转入口：点一下滚到对应版本行 */
+		.version-legend-item {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 4px 8px;
+			border: 0;
+			border-radius: 7px;
+			background: transparent;
+			font-family: inherit;
+			font-size: 11px;
+			font-weight: 600;
+			line-height: 1.4;
+			letter-spacing: 0.02em;
+			color: var(--vp-ink-3);
+			cursor: pointer;
+			transition: background 0.16s ease, color 0.16s ease;
+		}
+
+		.version-legend-item:hover {
+			background: var(--vp-surface-3);
+			color: var(--vp-ink-1);
+		}
+
+		.version-legend-item:active {
+			background: var(--vp-surface-3);
+		}
+
+		.version-legend-item:focus-visible {
+			outline: 2px solid var(--vp-warn-line);
+			outline-offset: 1px;
+		}
+
+		.version-legend-item[disabled] {
+			cursor: default;
+			opacity: 0.34;
+		}
+
+		.version-legend-item[disabled]:hover {
+			background: transparent;
+			color: var(--vp-ink-3);
+		}
+
+		.version-legend-item[disabled] .version-legend-arrow {
+			display: none;
+		}
+
+		.version-legend-arrow {
+			width: 11px;
+			height: 11px;
+			flex: 0 0 11px;
+			opacity: 0.42;
+			transition: opacity 0.16s ease, transform 0.16s ease;
+		}
+
+		.version-legend-item:hover .version-legend-arrow {
+			opacity: 0.9;
+		}
+
+		/* 日志由新到旧排列：最新版本永远在最上方，箭头朝上；当前版本在下方则朝下 */
+		.version-legend-item[data-dir="up"] .version-legend-arrow {
+			transform: rotate(180deg);
+		}
+
+		.version-legend-item[data-dir="down"]:hover .version-legend-arrow {
+			transform: translateY(1px);
+		}
+
+		.version-legend-item[data-dir="up"]:hover .version-legend-arrow {
+			transform: rotate(180deg) translateY(1px);
+		}
+
+		.version-legend-item i {
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			display: block;
+			flex: 0 0 7px;
+		}
+
+		.version-legend-item i.is-latest {
+			background: var(--vp-ok);
+			box-shadow: 0 0 0 3px var(--vp-ok-soft);
+		}
+
+		.version-legend-item i.is-current {
+			background: var(--vp-warn);
+			box-shadow: 0 0 0 3px var(--vp-warn-soft);
+		}
+
+		/* 纯容器：卡片自带底色，不再套一层灰框 */
 		.version-changelog-wrapper {
+			position: relative;
 			margin-top: 0;
-			padding: 12px;
-			border-radius: 12px;
-			border: 1px solid rgba(148, 163, 184, 0.28);
-			background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.92) 100%);
+			padding: 0;
+			border: 0;
+			border-radius: 0;
+			background: transparent;
+		}
+
+		/* 时间轴竖线：画在容器上，节点滑过其上 */
+		.version-changelog-wrapper::before {
+			content: '';
+			position: absolute;
+			left: 11px;
+			top: 12px;
+			bottom: 12px;
+			width: 2px;
+			border-radius: 2px;
+			background: linear-gradient(180deg, var(--vp-tl) 0%, var(--vp-tl) 86%, transparent 100%);
+			pointer-events: none;
 		}
 
 		.version-changelog-content {
+			position: relative;
 			max-height: min(68vh, 760px);
 			overflow-y: auto;
-			padding-right: 6px;
-			color: #1f2937;
-			font-size: 14px;
-			line-height: 1.7;
+			padding: 14px 10px 18px 34px;
+			color: var(--vp-ink-2);
+			font-size: 13px;
+			line-height: 1.65;
 			word-break: break-word;
+			scrollbar-width: thin;
+			overscroll-behavior: contain;
+		}
+
+		.version-changelog-content::-webkit-scrollbar {
+			width: 9px;
+		}
+
+		.version-changelog-content::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		.version-changelog-content::-webkit-scrollbar-thumb {
+			background: var(--vp-line-2);
+			border-radius: 99px;
+			border: 3px solid var(--vp-surface);
+			background-clip: content-box;
+		}
+
+		.version-changelog-content::-webkit-scrollbar-thumb:hover {
+			background: var(--vp-ink-3);
+			background-clip: content-box;
 		}
 
 		.version-changelog-content h3 {
 			margin: 12px 0 8px;
-			font-size: 16px;
+			font-size: 15px;
 			font-weight: 700;
-			color: #111827;
+			color: var(--vp-ink-1);
 		}
 
 		.version-changelog-content .changelog-version-row {
-			margin: 12px 0 10px;
-			padding: 10px 12px;
-			border-radius: 12px;
-			border: 1px solid rgba(148, 163, 184, 0.34);
-			background: linear-gradient(135deg, rgba(226, 232, 240, 0.55) 0%, rgba(241, 245, 249, 0.74) 100%);
+			position: relative;
 			display: block;
+			margin: 0 0 12px;
+			padding: 14px 16px 12px;
+			border: 1px solid var(--vp-line);
+			border-radius: 14px;
+			background: var(--vp-surface-2);
+			transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		}
+
+		.version-changelog-content .changelog-version-row:last-child {
+			margin-bottom: 4px;
+		}
+
+		.version-changelog-content .changelog-version-row:hover {
+			border-color: var(--vp-line-2);
+			box-shadow: 0 10px 26px -18px rgba(15, 23, 42, 0.35);
+		}
+
+		/* 时间轴节点 */
+		.version-changelog-content .changelog-version-row::before {
+			content: '';
+			position: absolute;
+			left: -28px;
+			top: 19px;
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			background: var(--vp-surface);
+			border: 2px solid var(--vp-line-2);
+			box-shadow: 0 0 0 3px var(--vp-surface);
+			transition: border-color 0.2s, background 0.2s;
 		}
 
 		.version-changelog-content .changelog-version-row.is-latest {
-			border-color: rgba(16, 185, 129, 0.52);
-			background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
-			box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.22);
+			box-shadow: inset 3px 0 0 var(--vp-ok);
+		}
+
+		.version-changelog-content .changelog-version-row.is-latest::before {
+			border-color: var(--vp-ok);
+			background: var(--vp-ok);
 		}
 
 		.version-changelog-content .changelog-version-row.is-current {
-			border-color: rgba(245, 158, 11, 0.62);
-			background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.1) 100%);
-			box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.24);
+			box-shadow: inset 3px 0 0 var(--vp-warn);
+			background: linear-gradient(100deg, var(--vp-warn-soft), transparent 45%), var(--vp-surface-2);
 		}
 
-		.version-changelog-content .changelog-version-row.is-current.is-latest {
-			border-color: rgba(16, 185, 129, 0.62);
-			background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(245, 158, 11, 0.14) 100%);
-			box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(245, 158, 11, 0.38);
+		.version-changelog-content .changelog-version-row.is-current::before {
+			border-color: var(--vp-warn);
+			background: var(--vp-warn);
+		}
+
+		/* 同时命中最新与当前：节点取绿，左侧强调条取橙 */
+		.version-changelog-content .changelog-version-row.is-latest.is-current {
+			box-shadow: inset 3px 0 0 var(--vp-warn);
+		}
+
+		.version-changelog-content .changelog-version-row.is-latest.is-current::before {
+			border-color: var(--vp-ok);
+			background: var(--vp-ok);
+		}
+
+		.version-changelog-content .changelog-version-row.is-current:hover,
+		.version-changelog-content .changelog-version-row.is-latest.is-current:hover {
+			box-shadow: inset 3px 0 0 var(--vp-warn), 0 10px 26px -18px rgba(15, 23, 42, 0.35);
+		}
+
+		/* 图例跳转命中后的短暂描边，帮用户确认"就是这一条" */
+		.version-changelog-content .changelog-version-row.is-jump-target {
+			outline: 2px solid var(--vp-ink-3);
+			outline-offset: 2px;
+			animation: versionJumpRing 1.4s ease-out forwards;
+		}
+
+		.version-changelog-content .changelog-version-row.is-jump-target.is-latest {
+			outline-color: var(--vp-ok);
+		}
+
+		.version-changelog-content .changelog-version-row.is-jump-target.is-current {
+			outline-color: var(--vp-warn);
+		}
+
+		@keyframes versionJumpRing {
+			0% {
+				outline-offset: 2px;
+			}
+
+			55% {
+				outline-offset: 2px;
+			}
+
+			100% {
+				outline-offset: 6px;
+				outline-color: transparent;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.version-changelog-content .changelog-version-row.is-jump-target {
+				animation: none;
+				outline-color: var(--vp-ink-3);
+			}
+		}
+
+		/* 最新版本的呼吸光晕 */
+		.version-changelog-content .changelog-version-row.is-latest::after {
+			content: '';
+			position: absolute;
+			left: -31px;
+			top: 16px;
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			background: var(--vp-ok-soft);
+			animation: versionNodePulse 2.8s ease-out infinite;
+			pointer-events: none;
+		}
+
+		@keyframes versionNodePulse {
+			0% {
+				transform: scale(0.6);
+				opacity: 0.75;
+			}
+
+			70% {
+				transform: scale(1.55);
+				opacity: 0;
+			}
+
+			100% {
+				transform: scale(1.55);
+				opacity: 0;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.version-changelog-content .changelog-version-row.is-latest::after {
+				animation: none;
+			}
 		}
 
 		.version-changelog-content .changelog-version-head {
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
-			gap: 10px;
+			gap: 9px;
 			flex-wrap: wrap;
 		}
 
 		.version-changelog-content .changelog-version-main {
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: 9px;
+			min-width: 0;
 			flex-wrap: wrap;
 		}
 
 		.version-changelog-content .changelog-version-badge {
 			display: inline-flex;
 			align-items: center;
-			padding: 2px 10px;
-			border-radius: 999px;
-			background: #111827;
-			color: #fff;
-			font-size: 12px;
+			padding: 3.5px 9px;
+			border-radius: 7px;
+			background: var(--vp-pill-bg);
+			color: var(--vp-pill-ink);
+			font-family: var(--vp-mono);
+			font-size: 12.5px;
 			font-weight: 700;
 			line-height: 1.4;
-			letter-spacing: 0.2px;
+			letter-spacing: -0.01em;
+			white-space: nowrap;
 		}
 
 		.version-changelog-content .changelog-version-date {
-			font-size: 11px;
-			color: #475569;
+			font-size: 11.5px;
 			font-weight: 400;
-			opacity: 0.82;
+			font-variant-numeric: tabular-nums;
+			letter-spacing: 0.01em;
+			color: var(--vp-ink-3);
 		}
 
 		.version-changelog-content .changelog-version-meta {
 			margin-left: auto;
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: 6px;
 			flex-wrap: wrap;
 		}
 
@@ -2472,104 +3094,158 @@
 		.version-changelog-content .changelog-version-latest {
 			display: inline-flex;
 			align-items: center;
-			padding: 2px 8px;
+			padding: 2.5px 8px;
+			border: 1px solid transparent;
 			border-radius: 999px;
-			font-size: 12px;
+			font-size: 11px;
 			font-weight: 700;
-			line-height: 1.35;
+			line-height: 1.4;
 			white-space: nowrap;
 		}
 
 		.version-changelog-content .changelog-version-latest {
-			color: #065f46;
-			border: 1px solid rgba(16, 185, 129, 0.46);
-			background: rgba(16, 185, 129, 0.2);
+			color: var(--vp-ok);
+			background: var(--vp-ok-soft);
+			border-color: var(--vp-ok-line);
 		}
 
 		.version-changelog-content .changelog-version-current {
-			color: #92400e;
-			border: 1px solid rgba(245, 158, 11, 0.54);
-			background: rgba(245, 158, 11, 0.2);
+			color: var(--vp-warn);
+			background: var(--vp-warn-soft);
+			border-color: var(--vp-warn-line);
 		}
 
 		.version-changelog-content .changelog-version-body {
-			margin-top: 10px;
-			padding-top: 10px;
-			border-top: 1px dashed rgba(100, 116, 139, 0.35);
-		}
-
-		.version-changelog-content .changelog-version-row.is-latest .changelog-version-body {
-			border-top-color: rgba(16, 185, 129, 0.42);
-		}
-
-		.version-changelog-content .changelog-version-row.is-current .changelog-version-body {
-			border-top-color: rgba(245, 158, 11, 0.46);
+			margin-top: 11px;
+			padding-top: 11px;
+			border-top: 1px dashed var(--vp-line);
 		}
 
 		.version-changelog-content .changelog-version-body h4 {
-			margin: 10px 0 6px;
-			font-size: 14px;
+			margin: 11px 0 6px;
+			font-size: 12.5px;
 			font-weight: 700;
-			color: #1f2937;
+			letter-spacing: 0.02em;
+			line-height: 1.4;
+			color: var(--vp-ink-1);
 		}
 
 		.version-changelog-content .changelog-version-body .changelog-subtitle {
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: 7px;
+			margin: 11px 0 6px;
+			font-size: 12.5px;
+			font-weight: 700;
+			letter-spacing: 0.02em;
+			line-height: 1.4;
 		}
 
+		.version-changelog-content .changelog-version-body .changelog-subtitle:first-child {
+			margin-top: 0;
+		}
+
+		/* 图标保留 SVG，改为浅色圆底 + currentColor 描边跟随类型色 */
 		.version-changelog-content .changelog-version-body .changelog-subtitle-icon {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			width: 16px;
-			height: 16px;
-			flex: 0 0 16px;
-			opacity: 0.95;
+			width: 18px;
+			height: 18px;
+			flex: 0 0 18px;
+			border-radius: 6px;
+			color: currentColor;
+			background: rgba(148, 163, 184, 0.14);
+			background: color-mix(in srgb, currentColor 13%, transparent);
+			opacity: 1;
 		}
 
 		.version-changelog-content .changelog-version-body .changelog-subtitle-icon svg {
 			display: block;
-			width: 16px;
-			height: 16px;
+			width: 11px;
+			height: 11px;
+		}
+
+		.version-changelog-content .changelog-version-body .changelog-subtitle-text {
+			min-width: 0;
 		}
 
 		.version-changelog-content .changelog-version-body .changelog-subtitle.is-new {
-			color: #047857;
-		}
-
-		.version-changelog-content .changelog-version-body .changelog-subtitle.is-debug {
-			color: #bd70ff;
+			color: var(--vp-ok);
 		}
 
 		.version-changelog-content .changelog-version-body .changelog-subtitle.is-improve {
-			color: #2563eb;
+			color: var(--vp-blue);
+		}
+
+		.version-changelog-content .changelog-version-body .changelog-subtitle.is-debug {
+			color: var(--vp-violet);
 		}
 
 		.version-changelog-content .changelog-version-body .changelog-subtitle.is-delete {
-			color: #8a7058;
+			color: var(--vp-ink-3);
 		}
 
-		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-new>li::marker {
-			color: #047857;
+		.version-changelog-content .changelog-version-body ul,
+		.version-changelog-content .changelog-version-body ul.changelog-sublist {
+			margin: 0 0 10px;
+			padding: 0 0 0 15px;
+			list-style: none;
 		}
 
-		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-debug>li::marker {
-			color: #bd70ff;
+		.version-changelog-content .changelog-version-body ul:last-child {
+			margin-bottom: 0;
 		}
 
-		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-improve>li::marker {
-			color: #2563eb;
+		.version-changelog-content .changelog-version-body li {
+			position: relative;
+			margin: 0 0 5px;
+			padding-left: 12px;
+			font-size: 13px;
+			line-height: 1.65;
+			color: var(--vp-ink-2);
 		}
 
-		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-delete>li::marker {
-			color: #8a7058;
+		.version-changelog-content .changelog-version-body li:last-child {
+			margin-bottom: 0;
+		}
+
+		.version-changelog-content .changelog-version-body li::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 9px;
+			width: 4px;
+			height: 4px;
+			border-radius: 50%;
+			background: var(--vp-ink-3);
+			opacity: 0.55;
+		}
+
+		/* 四态列表点色（替代原 ::marker 方案） */
+		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-new>li::before {
+			background: var(--vp-ok);
+			opacity: 0.9;
+		}
+
+		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-improve>li::before {
+			background: var(--vp-blue);
+			opacity: 0.9;
+		}
+
+		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-debug>li::before {
+			background: var(--vp-violet);
+			opacity: 0.9;
+		}
+
+		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-delete>li::before {
+			background: var(--vp-ink-3);
+			opacity: 0.55;
 		}
 
 		.version-changelog-content .changelog-version-body ul.changelog-sublist.is-delete>li {
 			text-decoration: line-through;
-			text-decoration-color: rgba(138, 112, 88, 0.58);
+			text-decoration-color: var(--vp-del-line);
 			text-decoration-thickness: 1px;
 		}
 
@@ -2577,44 +3253,65 @@
 			margin: 0 0 10px;
 		}
 
-		.version-changelog-content .changelog-version-body ul {
-			margin: 0 0 10px 18px;
-			padding: 0;
-		}
-
-		.version-changelog-content .changelog-version-body li {
-			margin: 0 0 6px;
+		.version-changelog-content del {
+			text-decoration: line-through;
+			text-decoration-thickness: 1px;
+			opacity: 0.55;
 		}
 
 		.version-changelog-content code {
-			padding: 1px 6px;
-			border-radius: 6px;
-			background: rgba(15, 23, 42, 0.08);
-			font-size: 12px;
+			font-family: var(--vp-mono);
+			padding: 1px 5px;
+			border: 1px solid var(--vp-line);
+			border-radius: 5px;
+			background: var(--vp-surface-3);
+			font-size: 11.5px;
+			color: var(--vp-ink-1);
 		}
 
 		.version-changelog-content a {
-			color: #2563eb;
+			color: var(--vp-blue);
 			text-decoration: none;
 			font-weight: 600;
+			border-bottom: 1px solid transparent;
 		}
 
 		.version-changelog-content a:hover {
-			text-decoration: underline;
+			text-decoration: none;
+			border-bottom-color: currentColor;
 		}
 
 		.version-changelog-placeholder {
 			margin: 0;
-			color: #6b7280;
+			font-size: 12.5px;
+			color: var(--vp-ink-3);
 		}
 
 		.version-changelog-actions {
-			margin-top: 12px;
-			display: block;
+			margin-top: 14px;
+			padding-top: 12px;
+			border-top: 1px solid var(--vp-line);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
 		}
 
-		.version-changelog-actions .btn {
-			width: 100%;
+		.version-changelog-note {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 11.5px;
+			letter-spacing: 0.01em;
+			color: var(--vp-ink-3);
+		}
+
+		.version-changelog-note::before {
+			content: '';
+			width: 5px;
+			height: 5px;
+			border-radius: 50%;
+			background: var(--vp-line-2);
 		}
 
 		/* 复选框样式 */
@@ -2817,26 +3514,128 @@
 				font-size: 11px;
 			}
 
-			.version-info-modal {
-				padding: 22px 16px;
+			.modal.version-info-modal {
+				width: calc(100vw - 24px);
+				padding: 20px 18px 14px;
+			}
+
+			.version-modal-hd {
+				gap: 11px;
+				padding-bottom: 13px;
+				margin-bottom: 14px;
+			}
+
+			.version-modal-hd-ic {
+				flex: 0 0 38px;
+				width: 38px;
+				height: 38px;
+				border-radius: 11px;
+				font-size: 18px;
 			}
 
 			.version-info-title {
-				font-size: 20px;
+				font-size: 17px;
+			}
+
+			.version-modal-hd-sub {
+				font-size: 11.5px;
+			}
+
+			.version-info-modal .modal-close,
+			.version-changelog-modal .modal-close {
+				top: 16px;
+				right: 16px;
 			}
 
 			.version-info-summary {
-				font-size: 14px;
-				padding: 12px;
+				grid-template-columns: minmax(0, 1fr);
+				gap: 10px;
+				padding: 14px;
 			}
 
-			.version-changelog-wrapper {
-				padding: 10px;
+			.version-info-arrow {
+				justify-self: start;
+				margin-left: 1px;
+			}
+
+			.version-info-arrow svg {
+				transform: rotate(90deg);
+			}
+
+			.version-info-v {
+				font-size: 14px;
+			}
+
+			.version-deploy-ic {
+				flex: 0 0 28px;
+				width: 28px;
+				height: 28px;
+				border-radius: 9px;
+			}
+
+			.version-deploy-ic svg {
+				width: 15px;
+				height: 15px;
+			}
+
+			.version-deploy-tx b {
+				font-size: 12.5px;
+			}
+
+			.version-deploy-tx small {
+				font-size: 10.5px;
+			}
+
+			.version-info-footer {
+				flex-wrap: wrap;
+			}
+
+			.modal.version-changelog-modal {
+				width: calc(100vw - 24px);
+				padding: 18px 16px 14px;
+			}
+
+			.version-changelog-legend {
+				gap: 12px;
+				padding-left: 26px;
+			}
+
+			.version-changelog-wrapper::before {
+				left: 7px;
 			}
 
 			.version-changelog-content {
 				max-height: 58vh;
-				font-size: 13px;
+				font-size: 12.5px;
+				padding: 12px 6px 14px 26px;
+			}
+
+			.version-changelog-content .changelog-version-row {
+				padding: 12px 13px 10px;
+			}
+
+			.version-changelog-content .changelog-version-row::before {
+				left: -23px;
+				top: 17px;
+				width: 10px;
+				height: 10px;
+			}
+
+			.version-changelog-content .changelog-version-row.is-latest::after {
+				left: -26px;
+				top: 14px;
+				width: 16px;
+				height: 16px;
+			}
+
+			.version-changelog-content .changelog-version-badge {
+				font-size: 11.5px;
+				padding: 2.5px 7px;
+			}
+
+			.version-changelog-content .changelog-version-meta {
+				margin-left: 0;
+				width: 100%;
 			}
 
 			.page-wrapper {
@@ -3037,10 +3836,6 @@
 			border-color: var(--border-color)
 		}
 
-		html.dark-mode #qrcodeModal .modal {
-			background: #808080;
-		}
-
 		html.dark-mode .modal input,
 		html.dark-mode .modal select,
 		html.dark-mode .modal textarea {
@@ -3175,175 +3970,79 @@
 			outline-color: rgba(251, 191, 36, 0.7);
 		}
 
-		html.dark-mode .version-info-title {
-			color: #f3f4f6;
+		/* 版本弹窗 · 夜间：仅覆写令牌 + 少量必要的具体规则 */
+		html.dark-mode .modal.version-info-modal,
+		html.dark-mode .modal.version-changelog-modal {
+			--vp-surface: #1a1a1a;
+			--vp-surface-2: #212121;
+			--vp-surface-3: #282828;
+			--vp-ink-1: #f2f2f2;
+			--vp-ink-2: #b6b6b6;
+			--vp-ink-3: #828282;
+			--vp-line: #2e2e2e;
+			--vp-line-2: #3c3c3c;
+			--vp-tl: #414141;
+			--vp-pill-bg: #2b2b2b;
+			--vp-pill-ink: #f7f7f7;
+			--vp-ok: #34d399;
+			--vp-ok-soft: rgba(16, 185, 129, 0.16);
+			--vp-ok-line: rgba(52, 211, 153, 0.34);
+			--vp-warn: #fbbf24;
+			--vp-warn-soft: rgba(245, 158, 11, 0.16);
+			--vp-warn-line: rgba(251, 191, 36, 0.34);
+			--vp-violet: #c4b5fd;
+			--vp-violet-soft: rgba(147, 51, 234, 0.18);
+			--vp-violet-line: rgba(196, 181, 253, 0.32);
+			--vp-blue: #93c5fd;
+			--vp-del-line: rgba(209, 182, 147, 0.7);
+			--vp-dep-accent: #fbbf24;
+			--vp-dep-bg: #212121;
+			--vp-dep-bg-h: #2a2620;
+			--vp-dep-line: #383838;
+			--vp-dep-ic-a: rgba(251, 191, 36, 0.16);
+			--vp-dep-ic-b: rgba(251, 191, 36, 0.05);
+			--vp-dep-ic-line: rgba(251, 191, 36, 0.20);
+
+			background: var(--vp-surface);
+			color: var(--vp-ink-1);
+			border-color: rgba(255, 255, 255, 0.07);
+			box-shadow: 0 30px 72px -26px rgba(0, 0, 0, 0.92), 0 0 0 1px rgba(255, 255, 255, 0.015);
 		}
 
-		html.dark-mode .version-info-summary {
-			color: #d1d5db;
-			border-color: rgba(100, 116, 139, 0.34);
-			background: linear-gradient(135deg, rgba(100, 116, 139, 0.2) 0%, rgba(71, 85, 105, 0.15) 100%);
+		html.dark-mode .version-info-modal .modal-close,
+		html.dark-mode .version-changelog-modal .modal-close {
+			color: var(--vp-ink-3);
 		}
 
-		html.dark-mode .version-info-summary.state-latest {
-			border-color: rgba(52, 211, 153, 0.5);
-			background: linear-gradient(135deg, rgba(16, 185, 129, 0.24) 0%, rgba(5, 150, 105, 0.18) 100%);
+		html.dark-mode .version-info-modal .modal-close:hover,
+		html.dark-mode .version-changelog-modal .modal-close:hover {
+			background: var(--vp-surface-3);
+			color: var(--vp-ink-1);
+			border-color: var(--vp-line);
 		}
 
-		html.dark-mode .version-info-summary.state-outdated {
-			border-color: rgba(251, 191, 36, 0.5);
-			background: linear-gradient(135deg, rgba(245, 158, 11, 0.24) 0%, rgba(217, 119, 6, 0.18) 100%);
+		html.dark-mode .version-info-modal .version-modal-hd-ic,
+		html.dark-mode .version-changelog-modal .version-modal-hd-ic {
+			box-shadow: 0 10px 22px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 		}
 
-		html.dark-mode .version-info-summary.state-preview {
-			border-color: rgba(196, 181, 253, 0.56);
-			background: linear-gradient(135deg, rgba(147, 51, 234, 0.24) 0%, rgba(126, 34, 206, 0.18) 100%);
+		html.dark-mode .version-deploy-ic {
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 		}
 
-		html.dark-mode .version-info-summary strong {
-			color: #f9fafb;
-		}
-
-		html.dark-mode .version-state-tip.is-latest {
-			color: #bbf7d0;
-			background: rgba(16, 185, 129, 0.24);
-			border-color: rgba(52, 211, 153, 0.52);
-		}
-
-		html.dark-mode .version-state-tip.is-outdated {
-			color: #fde68a;
-			background: rgba(245, 158, 11, 0.24);
-			border-color: rgba(251, 191, 36, 0.52);
-		}
-
-		html.dark-mode .version-state-tip.is-preview {
-			color: #e9d5ff;
-			background: rgba(147, 51, 234, 0.24);
-			border-color: rgba(196, 181, 253, 0.52);
-		}
-
-		html.dark-mode .btn-version-changelog {
-			background: linear-gradient(135deg, #f59e0b 0, #b45309 100%);
-			box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-		}
-
-		html.dark-mode .version-changelog-wrapper {
-			border-color: rgba(100, 116, 139, 0.46);
-			background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.75) 100%);
-		}
-
-		html.dark-mode .version-changelog-content {
-			color: #e5e7eb;
-		}
-
-		html.dark-mode .version-changelog-content h3,
-		html.dark-mode .version-changelog-content .changelog-version-body h4 {
-			color: #f9fafb;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body .changelog-subtitle.is-new {
-			color: #6ee7b7;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body .changelog-subtitle.is-debug {
-			color: #bd70ff;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body .changelog-subtitle.is-improve {
-			color: #93c5fd;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body .changelog-subtitle.is-delete {
-			color: #d1b693;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body ul.changelog-sublist.is-new>li::marker {
-			color: #6ee7b7;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body ul.changelog-sublist.is-debug>li::marker {
-			color: #bd70ff;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body ul.changelog-sublist.is-improve>li::marker {
-			color: #93c5fd;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body ul.changelog-sublist.is-delete>li::marker {
-			color: #d1b693;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body ul.changelog-sublist.is-delete>li {
-			text-decoration-color: rgba(209, 182, 147, 0.7);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-row {
-			border-color: rgba(148, 163, 184, 0.38);
-			background: linear-gradient(135deg, rgba(51, 65, 85, 0.45) 0%, rgba(30, 41, 59, 0.52) 100%);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-row.is-latest {
-			border-color: rgba(52, 211, 153, 0.56);
-			background: linear-gradient(135deg, rgba(5, 150, 105, 0.32) 0%, rgba(4, 120, 87, 0.2) 100%);
-			box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.22);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-row.is-current {
-			border-color: rgba(251, 191, 36, 0.68);
-			background: linear-gradient(135deg, rgba(245, 158, 11, 0.34) 0%, rgba(217, 119, 6, 0.2) 100%);
-			box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.26);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-row.is-current.is-latest {
-			border-color: rgba(52, 211, 153, 0.62);
-			background: linear-gradient(135deg, rgba(5, 150, 105, 0.28) 0%, rgba(245, 158, 11, 0.24) 100%);
-			box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.24), 0 0 0 1px rgba(251, 191, 36, 0.46);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-badge {
-			background: rgba(15, 23, 42, 0.9);
-			color: #f8fafc;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-date {
-			color: #94a3b8;
-			opacity: 0.84;
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-latest {
-			color: #bbf7d0;
-			border-color: rgba(52, 211, 153, 0.6);
-			background: rgba(5, 150, 105, 0.35);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-current {
-			color: #fde68a;
-			border-color: rgba(251, 191, 36, 0.66);
-			background: rgba(245, 158, 11, 0.36);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-body {
-			border-top-color: rgba(148, 163, 184, 0.44);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-row.is-latest .changelog-version-body {
-			border-top-color: rgba(52, 211, 153, 0.45);
-		}
-
-		html.dark-mode .version-changelog-content .changelog-version-row.is-current .changelog-version-body {
-			border-top-color: rgba(251, 191, 36, 0.5);
+		html.dark-mode .version-changelog-content::-webkit-scrollbar-thumb {
+			border-color: var(--vp-surface);
 		}
 
 		html.dark-mode .version-changelog-content code {
-			background: rgba(148, 163, 184, 0.22);
+			background: var(--vp-surface-3);
+			border-color: var(--vp-line);
 		}
 
-		html.dark-mode .version-changelog-content a {
-			color: #93c5fd;
-		}
-
-		html.dark-mode .version-changelog-placeholder {
-			color: #94a3b8;
+		html.dark-mode .version-info-footer .btn-version-close,
+		html.dark-mode .version-changelog-actions .btn-version-close {
+			background: transparent;
+			color: var(--vp-ink-2);
 		}
 
 		html.dark-mode .btn-secondary {
@@ -3632,10 +4331,10 @@
 			margin-bottom: 20px;
 			color: #1f2937;
 			display: flex;
-			justify-content: space-between;
+			justify-content: flex-start;
 			align-items: center;
 			cursor: pointer;
-			gap: 10px;
+			gap: 12px;
 		}
 
 		.module-title.non-collapsible {
@@ -3656,6 +4355,45 @@
 			transform: rotate(0deg);
 			transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, fill 0.2s ease, box-shadow 0.2s ease;
 		}
+
+		.module-icon {
+			width: 34px;
+			height: 34px;
+			flex: 0 0 34px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			box-sizing: border-box;
+			border-radius: 10px;
+			color: var(--ic-light, #6b7280);
+			background: rgba(var(--ic-rgb, 107, 114, 128), 0.12);
+			border: 1px solid rgba(var(--ic-rgb, 107, 114, 128), 0.26);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+		}
+
+		.module-icon svg {
+			width: 21px;
+			height: 21px;
+			display: block;
+		}
+
+		html.dark-mode .module-icon {
+			color: var(--ic-dark, #9ca3af);
+			background: rgba(var(--ic-rgb, 107, 114, 128), 0.16);
+			border-color: rgba(var(--ic-rgb, 107, 114, 128), 0.34);
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+		}
+
+		.module-icon--usage { --ic-light: #f6821f; --ic-dark: #fb923c; --ic-rgb: 246, 130, 31; }
+		.module-icon--network { --ic-light: #0ea5e9; --ic-dark: #38bdf8; --ic-rgb: 14, 165, 233; }
+		.module-icon--link { --ic-light: #6366f1; --ic-dark: #818cf8; --ic-rgb: 99, 102, 241; }
+		.module-icon--bolt { --ic-light: #f59e0b; --ic-dark: #fbbf24; --ic-rgb: 245, 158, 11; }
+		.module-icon--config { --ic-light: #64748b; --ic-dark: #94a3b8; --ic-rgb: 100, 116, 139; }
+		.module-icon--ech { --ic-light: #059669; --ic-dark: #34d399; --ic-rgb: 5, 150, 105; }
+		.module-icon--cdn { --ic-light: #f97316; --ic-dark: #fb923c; --ic-rgb: 249, 115, 22; }
+		.module-icon--convert { --ic-light: #14b8a6; --ic-dark: #2dd4bf; --ic-rgb: 20, 184, 166; }
+		.module-icon--notify { --ic-light: #f43f5e; --ic-dark: #fb7185; --ic-rgb: 244, 63, 94; }
+		.module-icon--log { --ic-light: #8b5cf6; --ic-dark: #a78bfa; --ic-rgb: 139, 92, 246; }
 
 		.module-title:not(.non-collapsible):hover .collapse-icon {
 			background: #f9fafb;
@@ -5301,6 +6039,776 @@
 		.btn-tg-import:active {
 			transform: translateY(0);
 			box-shadow: 0 2px 10px rgba(42, 171, 238, 0.4);
+		}
+
+		/* ===== 页脚 Telegram 图标彩蛋：长按 1s 唤起 TG WEB 代理面板 =====
+		   入口已从「📋 获取节点链接」面板迁移到这里，只有版本号达到
+		   TG_WEB_PROXY_MIN_VERSION 时才可触发，否则长按完全无反应 */
+		#tgEasterEggLink {
+			/* 长按期间不能让浏览器把手势解释成滚动/缩放，否则会直接 pointercancel */
+			touch-action: none;
+		}
+
+		/* 抖动开始之前刻意不给任何视觉反馈：没有进度环、没有按下缩放、没有描边变色。
+		   彩蛋是隐藏的，长按的第一秒必须和普通点击完全一样，否则太容易被试出来 */
+		.social-link.tg-egg-shaking,
+		.social-link.tg-egg-hot {
+			border-color: rgba(246, 130, 31, 0.75);
+			color: #f6821f;
+			box-shadow: 0 0 0 3px rgba(246, 130, 31, 0.16), 0 8px 22px rgba(246, 130, 31, 0.32);
+		}
+
+		.social-link.tg-egg-shaking {
+			animation: tgEggShake 0.42s linear infinite;
+		}
+
+		.social-link.tg-egg-hot {
+			animation-name: tgEggShakeHot;
+			animation-duration: 0.24s;
+		}
+
+		@keyframes tgEggShake {
+			0% {
+				transform: scale(0.98) translate3d(0, 0, 0) rotate(0deg);
+			}
+
+			20% {
+				transform: scale(0.98) translate3d(-1.4px, 0.6px, 0) rotate(-1.6deg);
+			}
+
+			40% {
+				transform: scale(0.98) translate3d(1.4px, -0.6px, 0) rotate(1.6deg);
+			}
+
+			60% {
+				transform: scale(0.98) translate3d(-1.1px, -0.5px, 0) rotate(-1.2deg);
+			}
+
+			80% {
+				transform: scale(0.98) translate3d(1.1px, 0.5px, 0) rotate(1.2deg);
+			}
+
+			100% {
+				transform: scale(0.98) translate3d(0, 0, 0) rotate(0deg);
+			}
+		}
+
+		@keyframes tgEggShakeHot {
+			0% {
+				transform: scale(0.99) translate3d(0, 0, 0) rotate(0deg);
+			}
+
+			25% {
+				transform: scale(0.99) translate3d(-2.6px, 1px, 0) rotate(-2.8deg);
+			}
+
+			50% {
+				transform: scale(0.99) translate3d(0, -1.6px, 0) rotate(0deg);
+			}
+
+			75% {
+				transform: scale(0.99) translate3d(2.6px, 1px, 0) rotate(2.8deg);
+			}
+
+			100% {
+				transform: scale(0.99) translate3d(0, 0, 0) rotate(0deg);
+			}
+		}
+
+		.social-link.tg-egg-glowing {
+			border-color: rgba(246, 130, 31, 0.85);
+			color: #f6821f;
+			/* 只叠静态光晕，绝不能写成 animation —— 抖动是 transform 动画，
+			   同一元素上再挂一个 animation 会把它顶掉，图标就停住了 */
+			box-shadow: 0 0 0 4px rgba(250, 171, 65, 0.16), 0 10px 28px rgba(246, 130, 31, 0.42);
+		}
+
+		/* 爆开的 emoji：固定定位挂 body，避免被 .social-link 的 overflow 裁掉 */
+		.tg-egg-burst-emoji {
+			position: fixed;
+			left: 0;
+			top: 0;
+			pointer-events: none;
+			z-index: 9000000004;
+			line-height: 1;
+			opacity: 0;
+			will-change: transform, opacity;
+			animation: tgEggBurstEmoji var(--tg-egg-duration, 960ms) cubic-bezier(0.16, 0.84, 0.3, 1) forwards;
+		}
+
+		@keyframes tgEggBurstEmoji {
+			0% {
+				opacity: 0;
+				transform: translate(-50%, -50%) scale(0.4);
+			}
+
+			14% {
+				opacity: 1;
+				transform: translate(-50%, -50%) scale(1.12);
+			}
+
+			100% {
+				opacity: 0;
+				transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(0.72) rotate(var(--rot, 0deg));
+			}
+		}
+
+		/* 彩蛋粒子层级：本次彩蛋的所有粒子挂在 body.tg-egg-fx-layer 作用域下统一压到 1500，
+		   低于 .modal-overlay(2e9)，面板弹出后不会被仍在飞的余留粒子盖住；
+		   不去改 .uuid-* 原规则，避免把 UUID 火箭彩蛋的粒子一起降级 */
+		body.tg-egg-fx-layer .uuid-gift-fx,
+		body.tg-egg-fx-layer .uuid-firework-burst,
+		body.tg-egg-fx-layer .uuid-firework-ring,
+		body.tg-egg-fx-layer .uuid-firework-flash,
+		body.tg-egg-fx-layer .tg-egg-burst-emoji {
+			z-index: 1500;
+		}
+
+		/* ===== 喷泉 emoji 的宿主层：让粒子在图标「之下」 =====
+		   图标被关在 .page-wrapper(position:fixed; z-index:1) 这个堆叠上下文里，
+		   body 级粒子挂多低的 z-index 都压不到图标下面（低于 1 就会被整张卡片盖住），
+		   所以喷泉粒子必须挂进 .card-container 内部，并且 DOM 排在社交图标之前：
+		   粒子和图标同属「定位元素 z-index:0」这一档，同档内 DOM 在后的后绘制、
+		   也就是画在上面 —— 图标于是盖住了从它身位里飞出来的粒子，
+		   观感变成「图标背后在往外喷」，而不是「鼠标在喷射」。
+		   层与卡片同尺寸同原点，粒子直接用卡片局部坐标，不受页面滚动影响 */
+		.tg-egg-fountain-layer {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0;
+			overflow: visible;
+			pointer-events: none;
+		}
+
+		/* 宿主层自身就是一个堆叠上下文，层内粒子 z-index 再大也出不去；
+		   这里显式归零，避免 9e9 / 1500 两条全局层级规则在层内排序时让人误读。
+		   不影响 UUID 火箭彩蛋：那些粒子仍然直接挂在 body 上 */
+		body.tg-egg-fx-layer .tg-egg-fountain-layer .uuid-gift-fx,
+		.tg-egg-fountain-layer .uuid-gift-fx {
+			position: absolute;
+			z-index: 0;
+		}
+
+		/* 低性能模式有一条 html.low-performance-mode * { animation: none !important }，
+		   会把彩蛋的抖动与粒子一起灭掉 —— 手机上就会变成「长按没反应，然后突然弹出面板」。
+		   彩蛋是用户主动触发的、一次性 4 秒的效果，这里单独放行；闪白仍在 JS 里跳过，
+		   粒子数量也仍按低性能减半，只是不让它彻底静止 */
+		html.low-performance-mode .social-link.tg-egg-shaking {
+			animation: tgEggShake 0.42s linear infinite !important;
+		}
+
+		html.low-performance-mode .social-link.tg-egg-hot {
+			animation: tgEggShakeHot 0.24s linear infinite !important;
+		}
+
+		html.low-performance-mode body.tg-egg-fx-layer .uuid-gift-fx {
+			animation: uuidGiftFountain var(--gift-duration, 0.92s) cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+		}
+
+		html.low-performance-mode body.tg-egg-fx-layer .uuid-firework-particle {
+			animation: uuidFireworkParticle var(--particle-duration, 1000ms) cubic-bezier(0.16, 0.84, 0.3, 1) forwards !important;
+		}
+
+		html.low-performance-mode body.tg-egg-fx-layer .uuid-firework-ring {
+			animation: uuidFireworkRing 0.82s ease-out forwards !important;
+		}
+
+		html.low-performance-mode body.tg-egg-fx-layer .uuid-firework-flash {
+			animation: uuidFireworkFlash 0.56s ease-out forwards !important;
+		}
+
+		html.low-performance-mode body.tg-egg-fx-layer .tg-egg-burst-emoji {
+			animation: tgEggBurstEmoji var(--tg-egg-duration, 960ms) cubic-bezier(0.16, 0.84, 0.3, 1) forwards !important;
+		}
+
+		/* ===== 彩蛋面板（TG WEB 代理）===== */
+		#tgEasterEggModal .modal {
+			width: 560px;
+			max-width: calc(100vw - 24px);
+			padding: 0;
+			border-radius: 16px;
+			border: 1px solid #e2e6ee;
+			text-align: left;
+			overflow: hidden;
+			background: #fff;
+			box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+		}
+
+		#tgEasterEggModal .tg-proxy-sheet {
+			position: relative;
+			display: block;
+			background: #fff;
+			color: #1f2937;
+			animation: tgProxySheetIn 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+		}
+
+		@keyframes tgProxySheetIn {
+			0% {
+				opacity: 0;
+				transform: translateY(14px) scale(0.965);
+			}
+
+			100% {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+
+		#tgEasterEggModal .tg-proxy-sheet::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			height: 2px;
+			z-index: 3;
+			background: linear-gradient(90deg, #faab41 0%, #f6821f 32%, #2aabee 100%);
+		}
+
+		#tgEasterEggModal .tg-proxy-head {
+			position: relative;
+			display: flex;
+			align-items: flex-start;
+			gap: 12px;
+			padding: 18px 18px 14px;
+			border-bottom: 1px solid #eef1f6;
+			background: linear-gradient(135deg, rgba(250, 171, 65, 0.10), rgba(42, 171, 238, 0.11) 72%);
+		}
+
+		#tgEasterEggModal .tg-proxy-chip {
+			flex: none;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 44px;
+			height: 44px;
+			border-radius: 14px;
+			color: #fff;
+			background-color: #2aabee;
+			background-image: linear-gradient(135deg, #2aabee 0%, #1d93cf 100%);
+			box-shadow: 0 8px 18px rgba(42, 171, 238, 0.32);
+		}
+
+		#tgEasterEggModal .tg-proxy-chip svg {
+			width: 22px;
+			height: 22px;
+		}
+
+		#tgEasterEggModal .tg-proxy-head-text {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		#tgEasterEggModal .tg-proxy-eyebrow {
+			margin: 0 0 3px;
+			font-size: 10px;
+			line-height: 1.2;
+			font-weight: 600;
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+			color: #f6821f;
+		}
+
+		#tgEasterEggModal .tg-proxy-title {
+			margin: 0;
+			font-size: 18px;
+			line-height: 1.3;
+			font-weight: 600;
+			color: #1f2937;
+		}
+
+		#tgEasterEggModal .tg-proxy-subtitle {
+			margin: 4px 0 0;
+			font-size: 12px;
+			line-height: 1.5;
+			color: #6b7280;
+		}
+
+		#tgEasterEggModal .tg-proxy-close {
+			flex: none;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 28px;
+			height: 28px;
+			margin: 0 0 0 auto;
+			padding: 0;
+			border: 1px solid transparent;
+			border-radius: 8px;
+			background: transparent;
+			color: #6b7280;
+			font-size: 16px;
+			line-height: 1;
+			cursor: pointer;
+			transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+		}
+
+		#tgEasterEggModal .tg-proxy-close svg {
+			width: 16px;
+			height: 16px;
+		}
+
+		#tgEasterEggModal .tg-proxy-close:hover {
+			background: rgba(15, 23, 42, 0.06);
+			border-color: #e2e6ee;
+			color: #1f2937;
+		}
+
+		#tgEasterEggModal .tg-proxy-close:focus-visible,
+		#tgEasterEggModal .tg-proxy-field:focus-visible {
+			outline: 2px solid rgba(42, 171, 238, 0.6);
+			outline-offset: 2px;
+		}
+
+		#tgEasterEggModal .tg-proxy-body {
+			padding: 16px 18px 4px;
+		}
+
+		#tgEasterEggModal .tg-proxy-qrrow {
+			display: flex;
+			align-items: flex-start;
+			gap: 16px;
+			padding-bottom: 14px;
+		}
+
+		#tgEasterEggModal .tg-proxy-qrblock {
+			flex: none;
+			width: 168px;
+		}
+
+		#tgEasterEggModal .tg-proxy-qrtile {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 168px;
+			height: 168px;
+			padding: 10px;
+			box-sizing: border-box;
+			border-radius: 14px;
+			/* 夜间也保持纯白，反色会直接拉低扫码识别率 */
+			background: #ffffff;
+			border: 1px solid #e2e6ee;
+			box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+		}
+
+		#tgEasterEggModal .tg-proxy-qr {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 148px;
+			height: 148px;
+			overflow: hidden;
+		}
+
+		#tgEasterEggModal .tg-proxy-qr canvas,
+		#tgEasterEggModal .tg-proxy-qr img {
+			width: 148px !important;
+			height: 148px !important;
+			border-radius: 6px;
+		}
+
+		#tgEasterEggModal .tg-proxy-qrfallback {
+			margin: 0;
+			padding: 0 6px;
+			font-size: 11px;
+			line-height: 1.6;
+			color: #6b7280;
+			text-align: center;
+		}
+
+		#tgEasterEggModal .tg-proxy-qrcap {
+			margin: 8px 0 0;
+			font-size: 11px;
+			line-height: 1.4;
+			color: #6b7280;
+			text-align: center;
+		}
+
+		#tgEasterEggModal .tg-proxy-meta {
+			flex: 1 1 auto;
+			align-self: stretch;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			gap: 10px;
+			min-width: 0;
+		}
+
+		#tgEasterEggModal .tg-proxy-metaline {
+			display: flex;
+			flex-direction: column;
+			gap: 3px;
+			min-width: 0;
+		}
+
+		#tgEasterEggModal .tg-proxy-metalabel {
+			font-size: 10px;
+			font-weight: 600;
+			letter-spacing: 0.1em;
+			color: #6b7280;
+		}
+
+		#tgEasterEggModal .tg-proxy-metavalue {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 12px;
+			line-height: 1.5;
+			color: #1f2937;
+			word-break: break-all;
+		}
+
+		#tgEasterEggModal .tg-proxy-fields {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			padding: 4px 0 14px;
+		}
+
+		#tgEasterEggModal .tg-proxy-field {
+			border-radius: 12px;
+			cursor: pointer;
+			outline: none;
+		}
+
+		#tgEasterEggModal .tg-proxy-field-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			margin-bottom: 5px;
+		}
+
+		#tgEasterEggModal .tg-proxy-field-label {
+			font-size: 11px;
+			font-weight: 600;
+			color: #1f2937;
+		}
+
+		#tgEasterEggModal .tg-proxy-field-hint {
+			font-size: 10px;
+			color: #9aa3af;
+		}
+
+		#tgEasterEggModal .tg-proxy-field-inputwrap {
+			position: relative;
+			display: flex;
+			align-items: center;
+			height: 42px;
+			border-radius: 10px;
+			border: 1px solid #e5e7eb;
+			background: #f3f4f6;
+			overflow: hidden;
+			transition: border-color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+		}
+
+		#tgEasterEggModal .tg-proxy-input {
+			flex: 1 1 auto;
+			width: 100%;
+			min-width: 0;
+			height: 100%;
+			margin: 0;
+			padding: 0 8px 0 12px;
+			box-sizing: border-box;
+			border: 0;
+			background: transparent;
+			color: #1f2937;
+			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 11px;
+			letter-spacing: -0.1px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			cursor: pointer;
+		}
+
+		#tgEasterEggModal .tg-proxy-input:focus {
+			outline: none;
+		}
+
+		#tgEasterEggModal .tg-proxy-copy {
+			flex: none;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 34px;
+			height: 100%;
+			border-left: 1px solid #e5e7eb;
+			background: rgba(255, 255, 255, 0.6);
+			color: #6b7280;
+			transition: color 0.22s ease, border-color 0.22s ease;
+		}
+
+		#tgEasterEggModal .tg-proxy-copy svg {
+			width: 15px;
+			height: 15px;
+		}
+
+		#tgEasterEggModal .tg-proxy-check-icon {
+			display: none;
+			color: #10b981;
+		}
+
+		#tgEasterEggModal .tg-proxy-field.is-copied .tg-proxy-copy-icon {
+			display: none;
+		}
+
+		#tgEasterEggModal .tg-proxy-field.is-copied .tg-proxy-check-icon {
+			display: block;
+		}
+
+		#tgEasterEggModal .tg-proxy-field.is-copied .tg-proxy-field-inputwrap {
+			border-color: #10b981;
+			background: rgba(16, 185, 129, 0.08);
+			box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.14);
+		}
+
+		#tgEasterEggModal .tg-proxy-field.is-copied .tg-proxy-copy {
+			border-left-color: rgba(16, 185, 129, 0.35);
+			color: #10b981;
+		}
+
+		#tgEasterEggModal .tg-proxy-field-progress {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 0;
+			height: 2px;
+			background: #10b981;
+			opacity: 0;
+		}
+
+		#tgEasterEggModal .tg-proxy-field.is-copied .tg-proxy-field-progress {
+			opacity: 1;
+			animation: tgProxyCopyProgress 1.4s linear forwards;
+		}
+
+		@keyframes tgProxyCopyProgress {
+			0% {
+				width: 0;
+			}
+
+			100% {
+				width: 100%;
+			}
+		}
+
+		#tgEasterEggModal .tg-proxy-foot {
+			padding: 14px 18px 16px;
+			border-top: 1px solid #eef1f6;
+			background: #fbfcfd;
+		}
+
+		#tgEasterEggModal .tg-proxy-import {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			width: 100%;
+			height: 46px;
+			border: 0;
+			border-radius: 12px;
+			color: #fff;
+			font-size: 15px;
+			font-weight: 600;
+			cursor: pointer;
+			/* 纯色兜底，避免个别环境不支持渐变时按钮变透明 */
+			background-color: #f6821f;
+			background-image: linear-gradient(135deg, #faab41, #f6821f);
+			box-shadow: 0 8px 20px rgba(246, 130, 31, 0.32);
+			transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s ease, filter 0.22s ease;
+		}
+
+		#tgEasterEggModal .tg-proxy-import svg {
+			flex: none;
+			width: 17px;
+			height: 17px;
+		}
+
+		#tgEasterEggModal .tg-proxy-import:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 12px 26px rgba(246, 130, 31, 0.42);
+			filter: saturate(1.08);
+		}
+
+		#tgEasterEggModal .tg-proxy-import:active {
+			transform: translateY(0);
+			box-shadow: 0 4px 12px rgba(246, 130, 31, 0.32);
+		}
+
+		/* 致谢行：比原脚注小半档、链接色深一档 + 极细下划线，可点但不与主按钮抢层级 */
+		#tgEasterEggModal .tg-proxy-credit {
+			margin: 7px 0 0;
+			font-size: 10.5px;
+			line-height: 1.55;
+			color: #6b7280;
+			text-align: center;
+		}
+
+		#tgEasterEggModal .tg-proxy-credit-link {
+			color: #4b5563;
+			font-weight: 500;
+			text-decoration: none;
+			border-bottom: 1px solid rgba(107, 114, 128, 0.3);
+			transition: color 0.2s ease, border-color 0.2s ease;
+		}
+
+		#tgEasterEggModal .tg-proxy-credit-link:hover {
+			color: #1d93cf;
+			border-bottom-color: rgba(42, 171, 238, 0.55);
+		}
+
+		#tgEasterEggModal .tg-proxy-credit-link:focus-visible {
+			outline: 2px solid rgba(42, 171, 238, 0.6);
+			outline-offset: 2px;
+			border-radius: 3px;
+		}
+
+		html.dark-mode #tgEasterEggModal {
+			background: rgba(0, 0, 0, 0.70);
+			-webkit-backdrop-filter: blur(8px);
+			backdrop-filter: blur(8px);
+		}
+
+		html.dark-mode #tgEasterEggModal .modal {
+			background: var(--bg-secondary);
+			border-color: #333;
+			box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-sheet {
+			background: var(--bg-secondary);
+			color: #e5e5e5;
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-head {
+			border-bottom-color: #333;
+			background: linear-gradient(135deg, rgba(250, 171, 65, 0.14), rgba(42, 171, 238, 0.16) 72%);
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-title,
+		html.dark-mode #tgEasterEggModal .tg-proxy-metavalue,
+		html.dark-mode #tgEasterEggModal .tg-proxy-field-label,
+		html.dark-mode #tgEasterEggModal .tg-proxy-input {
+			color: #e5e5e5;
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-subtitle,
+		html.dark-mode #tgEasterEggModal .tg-proxy-qrcap,
+		html.dark-mode #tgEasterEggModal .tg-proxy-qrfallback,
+		html.dark-mode #tgEasterEggModal .tg-proxy-metalabel,
+		html.dark-mode #tgEasterEggModal .tg-proxy-credit,
+		html.dark-mode #tgEasterEggModal .tg-proxy-field-hint,
+		html.dark-mode #tgEasterEggModal .tg-proxy-close {
+			color: #a0a0a0;
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-credit-link {
+			color: #c9cfd8;
+			border-bottom-color: rgba(201, 207, 216, 0.28);
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-credit-link:hover {
+			color: #4fb3e8;
+			border-bottom-color: rgba(79, 179, 232, 0.6);
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-field-inputwrap {
+			border-color: #444;
+			background: #2a2a2a;
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-copy {
+			border-left-color: #444;
+			background: rgba(255, 255, 255, 0.04);
+			color: #a0a0a0;
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-close:hover {
+			border-color: #444;
+			background: rgba(255, 255, 255, 0.08);
+			color: #e5e5e5;
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-foot {
+			border-top-color: #333;
+			background: rgba(255, 255, 255, 0.02);
+		}
+
+		html.dark-mode #tgEasterEggModal .tg-proxy-qrtile {
+			border-color: #333;
+			background: #ffffff;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+		}
+
+		@media (max-width: 560px) {
+			#tgEasterEggModal .modal {
+				width: calc(100vw - 24px);
+				max-width: calc(100vw - 24px);
+				max-height: 92vh;
+			}
+
+			#tgEasterEggModal .tg-proxy-head {
+				padding: 14px 14px 12px;
+			}
+
+			#tgEasterEggModal .tg-proxy-body {
+				max-height: 70vh;
+				overflow: auto;
+				padding: 14px 14px 4px;
+			}
+
+			#tgEasterEggModal .tg-proxy-qrrow {
+				flex-direction: column;
+				align-items: center;
+				gap: 12px;
+			}
+
+			#tgEasterEggModal .tg-proxy-qrblock {
+				width: 132px;
+				margin: 0 auto;
+			}
+
+			#tgEasterEggModal .tg-proxy-qrtile {
+				width: 132px;
+				height: 132px;
+				padding: 8px;
+			}
+
+			#tgEasterEggModal .tg-proxy-qr {
+				width: 116px;
+				height: 116px;
+			}
+
+			#tgEasterEggModal .tg-proxy-qr canvas,
+			#tgEasterEggModal .tg-proxy-qr img {
+				width: 116px !important;
+				height: 116px !important;
+			}
+
+			#tgEasterEggModal .tg-proxy-meta {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px 12px;
+				width: 100%;
+			}
+
+			#tgEasterEggModal .tg-proxy-foot {
+				padding: 12px 14px 14px;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.social-link.tg-egg-shaking,
+			.social-link.tg-egg-hot,
+			.tg-egg-burst-emoji {
+				animation: none;
+			}
+
+			#tgEasterEggModal .tg-proxy-sheet {
+				animation: none;
+			}
 		}
 
 		/* 订阅链接模块：操作按钮统一宽高
@@ -7199,14 +8707,459 @@
 			display: none;
 		}
 
-		/* QRCode 容器 */
-		.qrcode-container {
-			margin: 30px 0;
+		/* ===== 二维码弹窗（扫码导入卡片） ===== */
+		#qrcodeModal .qr-modal {
+			/* 浅色令牌 */
+			--qr-surface: #ffffff;
+			--qr-stage: #f1f7f9;
+			--qr-stage-line: #e2edf1;
+			--qr-t1: #0f172a;
+			--qr-t2: #64748b;
+			--qr-t3: #94a3b8;
+			--qr-line: #e9edf3;
+			--qr-accent: #06b6d4;
+			--qr-accent-ink: #0e7490;
+			--qr-accent-soft: rgba(6, 182, 212, 0.10);
+			--qr-accent-line: rgba(6, 182, 212, 0.22);
+			--qr-ghost-t: #334155;
+			--qr-ghost-bd: #dfe4eb;
+			--qr-ghost-hover: #f2f5f9;
+			--qr-card-shadow: 0 0 0 1px rgba(15, 23, 42, 0.035), 0 2px 4px rgba(15, 23, 42, 0.05), 0 10px 28px rgba(15, 23, 42, 0.08);
+			--qr-x-hover: rgba(15, 23, 42, 0.055);
+			--qr-warn: #b45309;
+			--qr-warn-soft: rgba(245, 158, 11, 0.12);
+			--qr-warn-line: rgba(245, 158, 11, 0.30);
+			max-width: 440px;
+			width: 100%;
+			min-width: 0;
+			padding: 0;
+			box-sizing: border-box;
+			border-radius: 20px;
+			background: var(--qr-surface);
+			text-align: left;
+			/* 横屏手机（如 812×375）会被 640 断点判为桌面布局，
+			   这里兜底：视口矮时内部滚动，不让弹窗上下溢出到不可达 */
+			max-height: calc(100vh - 24px);
+			max-height: calc(100dvh - 24px);
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+
+		html.dark-mode #qrcodeModal .qr-modal {
+			--qr-surface: #171512;
+			--qr-stage: #0c1113;
+			--qr-stage-line: #1b2529;
+			--qr-t1: #efece7;
+			--qr-t2: #9c968d;
+			--qr-t3: #8a857d;
+			--qr-line: #282521;
+			--qr-accent: #22d3ee;
+			--qr-accent-ink: #67e8f9;
+			--qr-accent-soft: rgba(34, 211, 238, 0.12);
+			--qr-accent-line: rgba(34, 211, 238, 0.24);
+			--qr-ghost-t: #d6d1c9;
+			--qr-ghost-bd: #332f29;
+			--qr-ghost-hover: #211e1a;
+			--qr-card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 10px 28px rgba(0, 0, 0, 0.55);
+			--qr-x-hover: rgba(255, 255, 255, 0.07);
+			--qr-warn: #fbbf24;
+			--qr-warn-soft: rgba(251, 191, 36, 0.13);
+			--qr-warn-line: rgba(251, 191, 36, 0.30);
+			border: 1px solid rgba(255, 255, 255, 0.055);
+		}
+
+		#qrcodeModal [hidden] {
+			display: none !important;
+		}
+
+		/* 头部 */
+		#qrcodeModal .qr-modal-hd {
 			display: flex;
-			justify-content: center;
+			align-items: flex-start;
+			gap: 12px;
+			padding: 20px 20px 16px;
+		}
+
+		#qrcodeModal .qr-modal-icon {
+			flex: 0 0 auto;
+			width: 36px;
+			height: 36px;
+			border-radius: 11px;
+			display: flex;
 			align-items: center;
-			min-height: 350px;
-			background: #808080;
+			justify-content: center;
+			background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+			box-shadow: 0 4px 12px rgba(6, 182, 212, 0.28);
+			color: #fff;
+			transition: background 0.2s ease, box-shadow 0.2s ease;
+		}
+
+		#qrcodeModal .qr-modal-icon svg {
+			width: 19px;
+			height: 19px;
+			display: block;
+		}
+
+		/* 错误态：图标砖由青转琥珀，语义不靠新增布局分支 */
+		#qrcodeModal .qr-modal.is-error .qr-modal-icon {
+			background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+			box-shadow: 0 4px 12px rgba(245, 158, 11, 0.28);
+		}
+
+		#qrcodeModal .qr-modal-titles {
+			flex: 1;
+			min-width: 0;
+			padding-top: 1px;
+		}
+
+		#qrcodeModal .qr-modal-title {
+			margin: 0;
+			font-size: 16.5px;
+			font-weight: 650;
+			letter-spacing: -0.005em;
+			line-height: 1.3;
+			color: var(--qr-t1);
+		}
+
+		#qrcodeModal .qr-modal-sub {
+			margin: 3px 0 0;
+			font-size: 12.5px;
+			font-weight: 500;
+			line-height: 1.4;
+			color: var(--qr-t2);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		#qrcodeModal .qr-modal-close {
+			flex: 0 0 auto;
+			width: 32px;
+			height: 32px;
+			margin: -4px -4px 0 0;
+			padding: 0;
+			border: 0;
+			background: transparent;
+			border-radius: 9px;
+			color: var(--qr-t3);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: background 0.16s ease, color 0.16s ease;
+		}
+
+		#qrcodeModal .qr-modal-close:hover {
+			background: var(--qr-x-hover);
+			color: var(--qr-t1);
+		}
+
+		#qrcodeModal .qr-modal-close:focus-visible {
+			outline: 2px solid var(--qr-accent);
+			outline-offset: 2px;
+		}
+
+		#qrcodeModal .qr-modal-close svg {
+			width: 15px;
+			height: 15px;
+			display: block;
+		}
+
+		#qrcodeModal .qr-modal-divider {
+			height: 1px;
+			background: var(--qr-line);
+		}
+
+		/* 主体 */
+		#qrcodeModal .qr-modal-body {
+			padding: 22px 20px 20px;
+		}
+
+		#qrcodeModal .qr-stage {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 0;
+			padding: 14px;
+			box-sizing: border-box;
+			border-radius: 18px;
+			background: var(--qr-stage);
+			border: 1px solid var(--qr-stage-line);
+		}
+
+		/* 错误态：舞台改为虚线占位框，和「有码」形态区分开 */
+		#qrcodeModal .qr-stage.is-empty {
+			padding: 0;
+			border-style: dashed;
+			border-color: var(--qr-warn-line);
+			background: transparent;
+		}
+
+		/* 二维码永远白底（扫描鲁棒性 > 主题一致性），深浅主题共用。
+		   width 用 min() 而不是固定值：窄屏能跟着容器收，避免 flex 撑破弹窗 */
+		#qrcodeModal .qr-card {
+			flex: 0 1 auto;
+			min-width: 0;
+			width: min(324px, 100%);
+			padding: 12px;
+			box-sizing: border-box;
+			background: #ffffff;
+			border-radius: 14px;
+			box-shadow: var(--qr-card-shadow);
+			line-height: 0;
+		}
+
+		/* QRCode 挂载点：宽度跟随白卡，canvas 与 img 叠放
+		   —— 库最终只会显示其中一个（另一个走内联 display:none），
+		   所以两个都绝对定位铺满，避免"看不到的那个"把高度撑成两倍 */
+		#qrcodeModal .qrcode-container {
+			position: relative;
+			width: 100%;
+			aspect-ratio: 1 / 1;
+			line-height: 0;
+		}
+
+		#qrcodeModal .qrcode-container canvas,
+		#qrcodeModal .qrcode-container img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100% !important;
+			height: 100% !important;
+		}
+
+		/* 元信息 chips */
+		#qrcodeModal .qr-meta {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 6px;
+			margin-top: 16px;
+		}
+
+		#qrcodeModal .qr-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 5px;
+			padding: 5px 10px;
+			border-radius: 999px;
+			font-size: 11.5px;
+			font-weight: 600;
+			letter-spacing: 0.01em;
+			white-space: nowrap;
+			background: var(--qr-accent-soft);
+			border: 1px solid var(--qr-accent-line);
+			color: var(--qr-accent-ink);
+		}
+
+		#qrcodeModal .qr-chip::before {
+			content: '';
+			width: 4px;
+			height: 4px;
+			border-radius: 50%;
+			background: currentColor;
+			opacity: 0.55;
+			flex: 0 0 auto;
+		}
+
+		#qrcodeModal .qr-chip.is-mute {
+			background: transparent;
+			border-color: var(--qr-line);
+			color: var(--qr-t2);
+		}
+
+		#qrcodeModal .qr-chip.is-mute::before {
+			display: none;
+		}
+
+		html.dark-mode #qrcodeModal .qr-chip.is-mute {
+			border-color: rgba(255, 255, 255, 0.13);
+			color: #a8a29a;
+		}
+
+		#qrcodeModal .qr-chip.is-warn {
+			background: var(--qr-warn-soft);
+			border-color: var(--qr-warn-line);
+			color: var(--qr-warn);
+		}
+
+		#qrcodeModal .qr-hint {
+			margin: 13px 0 0;
+			text-align: center;
+			font-size: 12px;
+			font-weight: 500;
+			line-height: 1.6;
+			color: var(--qr-t2);
+		}
+
+		/* 底部按钮 */
+		#qrcodeModal .qr-modal-ft {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+			padding: 0 20px 20px;
+		}
+
+		#qrcodeModal .qr-btn-ghost,
+		#qrcodeModal .qr-btn-primary {
+			height: 44px;
+			border-radius: 12px;
+			border: 0;
+			cursor: pointer;
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			font-size: 14px;
+			font-weight: 600;
+			letter-spacing: 0.01em;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 7px;
+			transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+			-webkit-appearance: none;
+			appearance: none;
+		}
+
+		#qrcodeModal .qr-btn-ghost svg,
+		#qrcodeModal .qr-btn-primary svg {
+			width: 15px;
+			height: 15px;
+			flex: 0 0 auto;
+		}
+
+		#qrcodeModal .qr-btn-ghost {
+			background: transparent;
+			color: var(--qr-ghost-t);
+			border: 1px solid var(--qr-ghost-bd);
+		}
+
+		#qrcodeModal .qr-btn-ghost:hover {
+			background: var(--qr-ghost-hover);
+		}
+
+		#qrcodeModal .qr-btn-primary {
+			background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+			color: #fff;
+			box-shadow: 0 3px 12px rgba(6, 182, 212, 0.30);
+		}
+
+		#qrcodeModal .qr-btn-primary:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 6px 20px rgba(6, 182, 212, 0.42);
+		}
+
+		#qrcodeModal .qr-btn-primary:active {
+			transform: translateY(0);
+			box-shadow: 0 2px 8px rgba(6, 182, 212, 0.32);
+		}
+
+		/* 错误态没有码可存：禁用主按钮并压掉所有 hover/active 反馈 */
+		#qrcodeModal .qr-btn-primary:disabled,
+		#qrcodeModal .qr-btn-primary:disabled:hover,
+		#qrcodeModal .qr-btn-primary:disabled:active {
+			opacity: 0.42;
+			box-shadow: none;
+			transform: none;
+			cursor: not-allowed;
+		}
+
+		#qrcodeModal .qr-btn-ghost:focus-visible,
+		#qrcodeModal .qr-btn-primary:focus-visible {
+			outline: 2px solid var(--qr-accent);
+			outline-offset: 2px;
+		}
+
+		/* 错误态内容块 */
+		#qrcodeModal .qr-error {
+			width: 100%;
+			min-height: 352px;
+			padding: 34px 24px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 12px;
+			text-align: center;
+		}
+
+		#qrcodeModal .qr-error-icon {
+			width: 48px;
+			height: 48px;
+			border-radius: 14px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--qr-warn-soft);
+			border: 1px solid var(--qr-warn-line);
+			color: var(--qr-warn);
+		}
+
+		#qrcodeModal .qr-error-icon svg {
+			width: 23px;
+			height: 23px;
+		}
+
+		#qrcodeModal .qr-error-title {
+			font-size: 14px;
+			font-weight: 650;
+			color: var(--qr-t1);
+		}
+
+		#qrcodeModal .qr-error-desc {
+			max-width: 280px;
+			font-size: 12.5px;
+			line-height: 1.7;
+			color: var(--qr-t2);
+		}
+
+		#qrcodeModal .qr-error-desc strong {
+			color: var(--qr-t1);
+			font-weight: 600;
+		}
+
+		/* 小屏：贴底抽屉形态（同一套 DOM，仅改对齐与圆角） */
+		@media (max-width: 640px) {
+			#qrcodeModal {
+				align-items: flex-end;
+				padding: 0;
+			}
+
+			#qrcodeModal .qr-modal {
+				max-width: 100%;
+				width: 100%;
+				border-radius: 22px 22px 0 0;
+				padding-bottom: env(safe-area-inset-bottom);
+			}
+
+			#qrcodeModal .qr-modal-hd {
+				padding: 16px 14px 12px;
+			}
+
+			#qrcodeModal .qr-modal-body {
+				padding: 16px 14px 14px;
+			}
+
+			#qrcodeModal .qr-stage {
+				padding: 8px;
+			}
+
+			#qrcodeModal .qr-card {
+				width: min(300px, 100%);
+				padding: 8px;
+			}
+
+			#qrcodeModal .qr-meta {
+				margin-top: 13px;
+			}
+
+			#qrcodeModal .qr-modal-ft {
+				padding: 0 14px 16px;
+			}
+
+			#qrcodeModal .qr-btn-ghost,
+			#qrcodeModal .qr-btn-primary {
+				height: 42px;
+				font-size: 13px;
+			}
 		}
 
 		/* 重置配置弹窗 */
@@ -8701,10 +10654,6 @@
 		/* 深色模式倒计时文字样式 */
 		html.dark-mode .countdown-text {
 			color: #9ca3af;
-		}
-
-		html.dark-mode .qrcode-container {
-			background: #808080;
 		}
 
 		/* 网络信息卡片样式 */
@@ -10866,6 +12815,18 @@
 				line-height: 1.35;
 			}
 
+			.module-icon {
+				width: 30px;
+				height: 30px;
+				flex-basis: 30px;
+				border-radius: 9px;
+			}
+
+			.module-icon svg {
+				width: 18px;
+				height: 18px;
+			}
+
 			.module .form-group,
 			#portSection {
 				gap: 7px;
@@ -11207,11 +13168,6 @@
 				font-size: 12px;
 			}
 
-			.qrcode-container {
-				min-height: 260px;
-				margin: 18px 0;
-			}
-
 			.qrcode-container img,
 			.qrcode-container canvas {
 				max-width: 100%;
@@ -11262,6 +13218,18 @@
 				gap: 6px;
 				margin-bottom: 11px;
 				font-size: 15px;
+			}
+
+			.module-icon {
+				width: 28px;
+				height: 28px;
+				flex-basis: 28px;
+				border-radius: 8px;
+			}
+
+			.module-icon svg {
+				width: 17px;
+				height: 17px;
 			}
 
 			.module-title .collapse-icon {
@@ -11838,7 +13806,10 @@
 			<!-- Cloudflare Workers/Pages 使用统计模块 -->
 			<div class="module cf-usage-module collapsed" id="cfUsageModule">
 				<div class="module-title" onclick="toggleModule(this)">
-					Workers/Pages 请求使用情况
+					<span class="module-icon module-icon--usage" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.7 16.2A7.8 7.8 0 1 1 19.3 16.2" stroke-width="2.4"/><path d="M12 13.6 16 8.4" stroke-width="2.1"/><circle cx="12" cy="13.6" r="1.8" fill="currentColor" stroke="none"/></svg>
+					</span>
+					<span class="module-label">W/P 请求使用情况</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -11896,7 +13867,10 @@
 			<!-- 网络信息模块 -->
 			<div class="module network-detail-collapsed">
 				<div class="module-title" onclick="toggleNetworkModule(this)">
-					🌍 当前网络信息
+					<span class="module-icon module-icon--network" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11.4" cy="12.4" r="7.6" fill="currentColor" fill-opacity=".09"/><circle cx="11.4" cy="12.4" r="7.6"/><path d="M3.8 12.4h15.2" opacity=".5"/><path d="M11.4 4.8a3.3 7.6 0 0 0 0 15.2 3.3 7.6 0 0 0 0-15.2Z" opacity=".5"/></svg>
+					</span>
+					<span class="module-label">当前网络信息</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24" style="transform: rotate(90deg);">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -11986,7 +13960,10 @@
 			<!-- 模块1: 订阅链接 -->
 			<div class="module">
 				<div class="module-title" onclick="toggleModule(this)">
-					📋 获取节点链接
+					<span class="module-icon module-icon--link" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.2 13.8a4.2 4.2 0 0 0 5.94 0l2.9-2.9a4.2 4.2 0 0 0-5.94-5.94l-1.4 1.4"/><path d="M13.8 10.2a4.2 4.2 0 0 0-5.94 0l-2.9 2.9a4.2 4.2 0 0 0 5.94 5.94l1.4-1.4" opacity=".55"/></svg>
+					</span>
+					<span class="module-label">获取节点链接</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -12054,25 +14031,16 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group tg-web-proxy-hidden" id="tgWebProxyGroup">
-						<label for="tgWebProxyLink">TG WEB代理</label>
-						<div class="input-wrapper subscription-link-wrapper">
-							<input type="text" id="tgWebProxyLink" title="TG WEB代理" readonly>
-							<div class="btn-container">
-								<button type="button" class="btn btn-tg-import"
-									onclick="importTGWebProxy()">一键导入</button>
-								<button type="button" class="btn btn-primary"
-									onclick="copySubscription('tgWebProxyLink')">复制链接</button>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 
 			<!-- 模块2: 编辑订阅生成 -->
 			<div class="module" id="preferredSubscriptionModule">
 				<div class="module-title non-collapsible">
-					⚡️ 优选订阅生成
+					<span class="module-icon module-icon--bolt" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 3.1 6.5 12.9h4.4l-1.4 8 7.1-9.8h-4.4l1.4-8Z" fill="currentColor" fill-opacity=".12"/></svg>
+					</span>
+					<span class="module-label">优选订阅生成</span>
 				</div>
 				<div class="module-content">
 
@@ -12163,7 +14131,10 @@
 			<!-- 模块3: 详细配置信息 -->
 			<div class="module collapsed advanced-module mode-always-visible">
 				<div class="module-title" onclick="toggleModule(this)">
-					⚙️ 详细配置信息
+					<span class="module-icon module-icon--config" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.4h5.1M14.7 7.4H20" opacity=".3" stroke-width="1.9"/><circle cx="11.7" cy="7.4" r="2.7" fill="currentColor" stroke="none"/><path d="M4 16.6h8.2M16 16.6H20" opacity=".3" stroke-width="1.9"/><circle cx="14.1" cy="16.6" r="2.7" fill="currentColor" stroke="none"/></svg>
+					</span>
+					<span class="module-label">详细配置信息</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -12372,7 +14343,10 @@
 			<!-- 模块3.5: ECH 设置(实验性质) -->
 			<div class="module collapsed advanced-module mode-always-visible" id="echModule" style="display: none;">
 				<div class="module-title" onclick="toggleModule(this)">
-					🔐 Encrypted Client Hello
+					<span class="module-icon module-icon--ech" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.4" y="10.1" width="15.2" height="9.8" rx="3.2" fill="currentColor" fill-opacity=".09"/><rect x="4.4" y="10.1" width="15.2" height="9.8" rx="3.2"/><path d="M8.1 10.1V7.8a3.9 3.9 0 0 1 7.8 0v2.3"/><circle cx="12" cy="14.3" r="1.4" fill="currentColor" stroke="none"/><path d="M12 15.5v1.9"/></svg>
+					</span>
+					<span class="module-label">Encrypted Client Hello</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -12452,7 +14426,10 @@
 			<!-- 模块4: 反代落地设置 -->
 			<div class="module collapsed advanced-module">
 				<div class="module-title" onclick="toggleModule(this)">
-					🌐 Cloudflare CDN 访问设置
+					<span class="module-icon module-icon--cdn" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 18.5h9.2a4.2 4.2 0 0 0 .4-8.38 6.2 6.2 0 0 0-11.9.9A4 4 0 0 0 7.5 18.5Z" fill="currentColor" fill-opacity=".08"/><path d="M12.5 11.3v4.2"/><path d="M10.7 13.6 12.5 15.4 14.3 13.6"/></svg>
+					</span>
+					<span class="module-label">Cloudflare CDN 访问设置</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -12879,7 +14856,10 @@
 			<!-- 模块5: 订阅转换配置 -->
 			<div class="module collapsed advanced-module">
 				<div class="module-title" onclick="toggleModule(this)">
-					🔄 订阅转换配置
+					<span class="module-icon module-icon--convert" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.2 8.7h12"/><path d="M13.4 6.1 16.4 8.7 13.4 11.3"/><path d="M19.8 15.3H7.8"/><path d="M10.6 12.7 7.6 15.3 10.6 17.9"/></svg>
+					</span>
+					<span class="module-label">订阅转换配置</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -12995,7 +14975,10 @@
 			<!-- 模块6: 消息通知设置 -->
 			<div class="module collapsed advanced-module">
 				<div class="module-title" onclick="toggleModule(this)">
-					🔔 消息通知设置
+					<span class="module-icon module-icon--notify" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 9.5a5.9 5.9 0 1 0-11.8 0c0 4.2-1.7 5.5-1.7 5.5h15.2s-1.7-1.3-1.7-5.5Z" fill="currentColor" fill-opacity=".09"/><path d="M9.7 18.2a2.6 2.6 0 0 0 4.6 0"/></svg>
+					</span>
+					<span class="module-label">消息通知设置</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -13047,7 +15030,10 @@
 			<!-- 模块7: 查看所有日志 -->
 			<div class="module collapsed advanced-module">
 				<div class="module-title" onclick="toggleModule(this); loadLogsOnExpand(this)">
-					📋 查看操作日志
+					<span class="module-icon module-icon--log" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 5.6v12.8" opacity=".28"/><circle cx="6.2" cy="7.4" r="1.5" fill="currentColor" stroke="none"/><circle cx="6.2" cy="12" r="1.5" fill="currentColor" stroke="none" opacity=".45"/><circle cx="6.2" cy="16.6" r="1.5" fill="currentColor" stroke="none" opacity=".45"/><path d="M10.4 7.4h8.2"/><path d="M10.4 12h8.2" opacity=".5"/><path d="M10.4 16.6h8.2" opacity=".5"/></svg>
+					</span>
+					<span class="module-label">查看操作日志</span>
 					<svg class="collapse-icon" viewBox="0 0 24 24">
 						<path d="M7 10l5 5 5-5z" />
 					</svg>
@@ -13095,7 +15081,8 @@
 					</svg>
 				</a>
 				<!-- Telegram 链接 -->
-				<a href="https://t.me/CMLiussss" target="_blank" rel="noopener" class="social-link" title="Telegram">
+				<a href="https://t.me/CMLiussss" target="_blank" rel="noopener" class="social-link" title="Telegram"
+					id="tgEasterEggLink">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 						<path fill="currentColor"
 							d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345c-.48.33-.913.49-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789c.027-.216.325-.437.893-.663c3.498-1.524 5.83-2.529 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635z" />
@@ -13117,12 +15104,177 @@
 		</div>
 	</div>
 
+	<!-- TG WEB 代理彩蛋弹窗（页脚 Telegram 图标长按 1s 触发） -->
+	<div class="modal-overlay" id="tgEasterEggModal" onclick="tgEasterEggClose(event)">
+		<div class="modal tg-proxy-modal" role="dialog" aria-modal="true" aria-labelledby="tgEasterEggTitle"
+			onclick="event.stopPropagation()">
+			<div class="tg-proxy-sheet">
+				<div class="tg-proxy-head">
+					<span class="tg-proxy-chip" aria-hidden="true">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+							<path fill="currentColor"
+								d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345c-.48.33-.913.49-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789c.027-.216.325-.437.893-.663c3.498-1.524 5.83-2.529 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635z" />
+						</svg>
+					</span>
+					<div class="tg-proxy-head-text">
+						<p class="tg-proxy-eyebrow">隐藏彩蛋 · EASTER EGG</p>
+						<h2 class="tg-proxy-title" id="tgEasterEggTitle">Telegram Web 代理</h2>
+						<p class="tg-proxy-subtitle">扫码或复制链接，导入到任意客户端</p>
+					</div>
+					<button type="button" class="tg-proxy-close" aria-label="关闭" onclick="tgEasterEggClose()">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+							<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+								d="M6 6l12 12M18 6L6 18" />
+						</svg>
+					</button>
+				</div>
+				<div class="tg-proxy-body">
+					<div class="tg-proxy-qrrow">
+						<div class="tg-proxy-qrblock">
+							<div class="tg-proxy-qrtile">
+								<div class="tg-proxy-qr" id="tgEasterEggQr"></div>
+							</div>
+							<p class="tg-proxy-qrcap">在 Telegram 内扫码</p>
+						</div>
+						<div class="tg-proxy-meta">
+							<div class="tg-proxy-metaline">
+								<span class="tg-proxy-metalabel">服务器 SERVER</span>
+								<span class="tg-proxy-metavalue" id="tgEasterEggServer">—</span>
+							</div>
+							<div class="tg-proxy-metaline">
+								<span class="tg-proxy-metalabel">密钥 SECRET</span>
+								<span class="tg-proxy-metavalue" id="tgEasterEggSecret">—</span>
+							</div>
+						</div>
+					</div>
+					<div class="tg-proxy-fields">
+						<div class="tg-proxy-field" role="button" tabindex="0" title="点击复制 tg:// 深度链接"
+							onclick="tgEasterEggCopyRow(this)" onkeydown="tgEasterEggCopyRowKey(event, this)">
+							<div class="tg-proxy-field-head">
+								<span class="tg-proxy-field-label">tg:// 深度链接</span>
+								<span class="tg-proxy-field-hint">点击整行复制</span>
+							</div>
+							<div class="tg-proxy-field-inputwrap">
+								<input type="text" class="tg-proxy-input" id="tgEasterEggImportInput" readonly
+									spellcheck="false" aria-label="tg:// 深度链接">
+								<span class="tg-proxy-copy" aria-hidden="true">
+									<svg class="tg-proxy-copy-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+										<rect x="9" y="9" width="11" height="11" rx="2" fill="none"
+											stroke="currentColor" stroke-width="2" />
+										<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+											d="M15 5.5A1.5 1.5 0 0 0 13.5 4H6a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 6 14" />
+									</svg>
+									<svg class="tg-proxy-check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+										<path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+											stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7" />
+									</svg>
+								</span>
+								<span class="tg-proxy-field-progress" aria-hidden="true"></span>
+							</div>
+						</div>
+						<div class="tg-proxy-field" role="button" tabindex="0" title="点击复制 https:// 分享链接"
+							onclick="tgEasterEggCopyRow(this)" onkeydown="tgEasterEggCopyRowKey(event, this)">
+							<div class="tg-proxy-field-head">
+								<span class="tg-proxy-field-label">https:// 分享链接</span>
+								<span class="tg-proxy-field-hint">点击整行复制</span>
+							</div>
+							<div class="tg-proxy-field-inputwrap">
+								<input type="text" class="tg-proxy-input" id="tgEasterEggShareInput" readonly
+									spellcheck="false" aria-label="https:// 分享链接">
+								<span class="tg-proxy-copy" aria-hidden="true">
+									<svg class="tg-proxy-copy-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+										<rect x="9" y="9" width="11" height="11" rx="2" fill="none"
+											stroke="currentColor" stroke-width="2" />
+										<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+											d="M15 5.5A1.5 1.5 0 0 0 13.5 4H6a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 6 14" />
+									</svg>
+									<svg class="tg-proxy-check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+										<path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+											stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7" />
+									</svg>
+								</span>
+								<span class="tg-proxy-field-progress" aria-hidden="true"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="tg-proxy-foot">
+					<button type="button" class="tg-proxy-import" onclick="importTGWebProxy()">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+							<path fill="currentColor"
+								d="M21.9 3.4a1.2 1.2 0 0 0-1.3-.2L2.7 10.6c-.9.4-.9 1.6.1 1.9l4.6 1.5l1.7 5.4c.3.9 1.4 1.1 2 .4l2.5-2.7l4.4 3.2c.7.5 1.7.1 1.9-.8l2.5-14.9c.1-.5-.1-.9-.5-1.2zM9.6 13.2l7.6-4.7l-6.2 5.6l-.3 3.1l-1.1-4z" />
+						</svg>
+						<span>一键导入 TG WEB 代理</span>
+					</button>
+					<p class="tg-proxy-credit">代理实现基于开源项目
+						<a class="tg-proxy-credit-link" href="https://github.com/ToiCF/CF-Workers-TGProxy"
+							target="_blank" rel="noopener noreferrer">ToiCF / CF-Workers-TGProxy</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- 二维码弹窗 -->
 	<div class="modal-overlay" id="qrcodeModal" onclick="closeQRCode(event)">
-		<div class="modal" onclick="event.stopPropagation()">
-			<button type="button" class="modal-close" onclick="closeQRCode()">×</button>
-			<div id="qrcodeContainer" class="qrcode-container"></div>
-			<button type="button" class="btn btn-primary btn-close-modal" onclick="closeQRCode()">关闭</button>
+		<div class="modal qr-modal" onclick="event.stopPropagation()">
+			<div class="qr-modal-hd">
+				<div class="qr-modal-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+						stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="3" width="7" height="7" rx="1.4" />
+						<rect x="14" y="3" width="7" height="7" rx="1.4" />
+						<rect x="3" y="14" width="7" height="7" rx="1.4" />
+						<path d="M14 14h3v3h-3zM20 14h1M14 20h3M20 18v3" />
+					</svg>
+				</div>
+				<div class="qr-modal-titles">
+					<h2 class="qr-modal-title" id="qrcodeTitle">扫码导入</h2>
+					<p class="qr-modal-sub" id="qrcodeSubtitle">正在生成二维码…</p>
+				</div>
+				<button type="button" class="qr-modal-close" onclick="closeQRCode()" aria-label="关闭二维码弹窗">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
+						<path d="M6 6l12 12M18 6L6 18" />
+					</svg>
+				</button>
+			</div>
+			<div class="qr-modal-divider"></div>
+			<div class="qr-modal-body">
+				<div class="qr-stage">
+					<div class="qr-card">
+						<div id="qrcodeContainer" class="qrcode-container"></div>
+					</div>
+					<div class="qr-error" id="qrcodeError" hidden>
+						<div class="qr-error-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="M12 9v4M12 17h.01" />
+								<path d="M10.3 3.9 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+							</svg>
+						</div>
+						<div class="qr-error-title" id="qrcodeErrorTitle">链接过长</div>
+						<div class="qr-error-desc" id="qrcodeErrorDesc"></div>
+					</div>
+				</div>
+				<div class="qr-meta" id="qrcodeMeta">
+					<span class="qr-chip" id="qrcodeChipType">订阅链接</span>
+					<span class="qr-chip is-mute" id="qrcodeChipLen">—</span>
+					<span class="qr-chip is-mute" id="qrcodeChipLevel">纠错 高</span>
+				</div>
+				<p class="qr-hint" id="qrcodeHint">用手机相机，或在客户端内「扫一扫」导入</p>
+			</div>
+			<div class="qr-modal-ft">
+				<button type="button" class="qr-btn-ghost" onclick="closeQRCode()">关闭</button>
+				<button type="button" class="qr-btn-primary" id="qrcodeSaveBtn" onclick="saveQRCode()">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+						stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 3.5v10.5" />
+						<path d="m7.6 9.9 4.4 4.4 4.4-4.4" />
+						<path d="M4.5 17.5V19a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1.5" />
+					</svg>
+					保存二维码
+				</button>
+			</div>
 		</div>
 	</div>
 
@@ -13130,23 +15282,113 @@
 	<div class="modal-overlay" id="versionInfoModal" onclick="closeVersionInfoModal(event)">
 		<div class="modal version-info-modal" onclick="event.stopPropagation()">
 			<button type="button" class="modal-close" onclick="closeVersionInfoModal()">×</button>
-			<h2 class="version-info-title">🚀 关于 edgetunnel</h2>
+			<div class="version-modal-hd">
+				<div class="version-modal-hd-ic" aria-hidden="true">🚀</div>
+				<div class="version-modal-hd-tx">
+					<h2 class="version-info-title">关于 edgetunnel</h2>
+					<p class="version-modal-hd-sub">版本信息与升级入口</p>
+				</div>
+			</div>
 			<div class="version-info-summary state-outdated" id="versionInfoSummary">
-				<p id="latestVersionInfoText" class="version-info-line"><strong>最新版本:</strong> <span
-						id="latestVersionInfoValue">v0</span></p>
-				<p id="currentVersionInfoText" class="version-info-line"><strong>当前版本:</strong> <span
-						id="currentVersionInfoValue">v0</span> <span id="currentVersionStateText"
-						class="version-state-tip is-outdated">需要更新</span></p>
+				<p id="currentVersionInfoText" class="version-info-line">
+					<strong class="version-info-k">当前版本</strong>
+					<span class="version-info-v" id="currentVersionInfoValue">v0</span>
+					<span id="currentVersionStateText" class="version-state-tip is-outdated">需要更新</span>
+				</p>
+				<div class="version-info-arrow" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+						stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4.5 12h14" />
+						<path d="m13 6.5 5.5 5.5L13 17.5" />
+					</svg>
+				</div>
+				<p id="latestVersionInfoText" class="version-info-line">
+					<strong class="version-info-k">最新版本</strong>
+					<span class="version-info-v" id="latestVersionInfoValue">v0</span>
+					<span class="version-state-tip is-latest">已发布</span>
+				</p>
+				<div class="version-info-hint">
+					<span class="version-hint-item version-hint-outdated"><i aria-hidden="true"><svg
+								viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"
+								stroke-linecap="round">
+								<path d="M12 6.2v7.2" />
+								<path d="M12 17.4h.01" />
+							</svg></i>有新版本可用，复制最新源码重新部署即可完成升级</span>
+					<span class="version-hint-item version-hint-latest"><i aria-hidden="true"><svg
+								viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="m6 12.4 3.6 3.6L18 7.6" />
+							</svg></i>已是最新版本，无需操作</span>
+					<span class="version-hint-item version-hint-preview"><i aria-hidden="true"><svg
+								viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"
+								stroke-linecap="round">
+								<path d="M12 11v6.4" />
+								<path d="M12 7.4h.01" />
+							</svg></i>当前为预览版，版本号高于线上发布</span>
+				</div>
 			</div>
 			<div class="version-info-actions">
-				<button type="button" id="versionCopyBtn" class="btn btn-version-copy"
-					onclick="copyLatestWorkerSourceToClipboard()">📋
-					复制最新Worker.js源码 到剪贴板</button>
-				<button type="button" class="btn btn-version-download" onclick="openLatestPagesZipDownload()">📦
-					下载最新Pages.zip源码 上传部署</button>
+				<p class="version-deploy-label">选择部署方式</p>
+				<div class="version-deploy-list">
+					<button type="button" id="versionCopyBtn" class="btn btn-version-copy"
+						onclick="copyLatestWorkerSourceToClipboard()">
+						<span class="version-deploy-ic" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="m8 8-3.6 4L8 16" />
+								<path d="m16 8 3.6 4L16 16" />
+								<path d="m13.4 5-2.8 14" />
+							</svg>
+						</span>
+						<span class="version-deploy-tx">
+							<b>复制 Worker 源码</b>
+							<small>粘贴到 Cloudflare Workers</small>
+						</span>
+					</button>
+					<button type="button" id="versionWorkerDownloadBtn" class="btn btn-version-download"
+						onclick="downloadLatestWorkerFile()">
+						<span class="version-deploy-ic" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="M14 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z" />
+								<path d="M14 3.5V8h4.5" />
+								<path d="M12 10.4v6.2" />
+								<path d="m9.6 14.2 2.4 2.4 2.4-2.4" />
+							</svg>
+						</span>
+						<span class="version-deploy-tx">
+							<b>下载 Worker.js 文件</b>
+							<small>上传到 Cloudflare Workers</small>
+						</span>
+					</button>
+					<button type="button" id="versionPagesZipDownloadBtn" class="btn btn-version-download"
+						onclick="downloadLatestPagesZip()">
+						<span class="version-deploy-ic" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="M12 3.5v9.6" />
+								<path d="m8.5 9.3 3.5 3.5 3.5-3.5" />
+								<path d="M4.5 15.6V18a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2.4" />
+							</svg>
+						</span>
+						<span class="version-deploy-tx">
+							<b>下载 Pages.zip 压缩包</b>
+							<small>上传到 Cloudflare Pages</small>
+						</span>
+					</button>
+				</div>
+			</div>
+			<div class="version-info-footer">
 				<button type="button" class="btn btn-version-changelog" id="versionChangelogToggleBtn"
-					onclick="openVersionChangelogModal()">📜 查看更新日志</button>
-				<button type="button" class="btn btn-secondary" onclick="closeVersionInfoModal()">取消</button>
+					onclick="openVersionChangelogModal()">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+						stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M9 6h11M9 12h11M9 18h11" />
+						<path d="M4.4 6h.01M4.4 12h.01M4.4 18h.01" />
+					</svg>
+					查看更新日志
+				</button>
+				<button type="button" class="btn btn-version-close" onclick="closeVersionInfoModal()">关闭</button>
 			</div>
 		</div>
 	</div>
@@ -13155,14 +15397,41 @@
 	<div class="modal-overlay" id="versionChangelogModal" onclick="closeVersionChangelogModal(event)">
 		<div class="modal version-changelog-modal" onclick="event.stopPropagation()">
 			<button type="button" class="modal-close" onclick="closeVersionChangelogModal()">×</button>
-			<h2 class="version-info-title">📜 更新日志</h2>
+			<div class="version-modal-hd">
+				<div class="version-modal-hd-ic" aria-hidden="true">📜</div>
+				<div class="version-modal-hd-tx">
+					<h2 class="version-info-title">更新日志</h2>
+					<p class="version-modal-hd-sub">每次发布自动同步 · 由新到旧排列</p>
+				</div>
+			</div>
+			<div class="version-changelog-legend">
+				<button type="button" class="version-legend-item" data-jump="latest" data-dir="up"
+					onclick="jumpToChangelogEntry('latest')" aria-label="跳转到最新版本所在行">
+					<i class="is-latest" aria-hidden="true"></i>最新版本
+					<svg class="version-legend-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M12 5v13" />
+						<path d="m6.5 12.4 5.5 5.5 5.5-5.5" />
+					</svg>
+				</button>
+				<button type="button" class="version-legend-item" data-jump="current" data-dir="down"
+					onclick="jumpToChangelogEntry('current')" aria-label="跳转到当前使用版本所在行">
+					<i class="is-current" aria-hidden="true"></i>当前使用
+					<svg class="version-legend-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M12 5v13" />
+						<path d="m6.5 12.4 5.5 5.5 5.5-5.5" />
+					</svg>
+				</button>
+			</div>
 			<div class="version-changelog-wrapper">
 				<div class="version-changelog-content" id="versionChangelogContent">
 					<p class="version-changelog-placeholder">等待加载更新日志...</p>
 				</div>
 			</div>
 			<div class="version-changelog-actions">
-				<button type="button" class="btn btn-secondary" onclick="closeVersionChangelogModal()">关闭</button>
+				<span class="version-changelog-note">内容来自仓库 CHANGELOG</span>
+				<button type="button" class="btn btn-version-close" onclick="closeVersionChangelogModal()">关闭</button>
 			</div>
 		</div>
 	</div>
@@ -20520,23 +22789,9 @@
 			}
 		}
 
-		// ==================== 复制按钮长按彩蛋（JShaman 混淆）====================
-		const VERSION_COPY_LONG_PRESS_MS = 618;
-		const VERSION_COPY_FETCH_TIMEOUT_MS = 60000;
-		const VERSION_COPY_SUPPRESS_CLICK_MS = 500;
-		const JSHAMAN_SUBMIT_URL = 'https://www.jshaman.com:4430/submit_js_code/';
-		const JSHAMAN_VIP_CODE = 'free';
-		const JSHAMAN_FREE_MAX_BYTES = 512 * 1024;
-		let versionCopyPressTimer = null;
-		let versionCopyAbortController = null;
-		let versionCopyPressActive = false;
-		let versionCopyEasterEggActive = false;
-		let versionCopyRequestInFlight = false;
-		let versionCopyEasterEggDone = false;
-		let versionCopyUserReleased = false;
-		let versionCopyLastPointerHandledAt = 0;
+		// ==================== 复制最新 Worker.js 源码 ====================
 
-		// 通用剪贴板复制（供原始复制与彩蛋混淆复制复用）
+		// 通用剪贴板复制（含 execCommand 兜底）
 		async function copyTextToClipboard(text) {
 			const content = String(text ?? '');
 			if (!content) {
@@ -20567,25 +22822,7 @@
 			}
 		}
 
-		// 复制原始（未混淆）源码并提示，保持原有点击行为
-		function copyOriginalWorkerSourceWithToast() {
-			const source = String(cachedWorkerVersionRawText || '');
-			if (!source) {
-				showToast('暂无可复制的最新 Worker.js 源码', 'error');
-				return;
-			}
-			copyTextToClipboard(source).then((copied) => {
-				showToast(copied ? '✅ 已复制最新 Worker.js 源码到剪贴板' : '复制失败，请手动复制源码', copied ? 'success' : 'error');
-			});
-		}
-
 		async function copyLatestWorkerSourceToClipboard() {
-			// 若刚刚已由长按指针事件处理过复制，则跳过（避免 click 与 pointerup 双重复制）
-			if (Date.now() - versionCopyLastPointerHandledAt < VERSION_COPY_SUPPRESS_CLICK_MS) {
-				versionCopyLastPointerHandledAt = 0;
-				return;
-			}
-
 			const source = String(cachedWorkerVersionRawText || '');
 			if (!source) {
 				showToast('暂无可复制的最新 Worker.js 源码', 'error');
@@ -20600,188 +22837,203 @@
 			}
 		}
 
-		// 调用 JShaman 免费混淆 Web API，返回混淆后的代码
-		async function obfuscateWorkerSourceWithJShaman(source) {
-			const controller = new AbortController();
-			versionCopyAbortController = controller;
-			const timeoutId = setTimeout(() => controller.abort(), VERSION_COPY_FETCH_TIMEOUT_MS);
-
-			try {
-				const response = await fetch(JSHAMAN_SUBMIT_URL, {
-					method: 'POST',
-					mode: 'cors',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					// JShaman 免费 VIP 码(free)不支持 config 参数（实测返回"权限不足，您的VIP码无法配置参数"），故使用其服务端默认混淆参数
-					body: JSON.stringify({
-						js_code: String(source),
-						vip_code: JSHAMAN_VIP_CODE
-					}),
-					signal: controller.signal
-				});
-				if (!response.ok) throw new Error('JShaman 请求失败 HTTP ' + response.status);
-
-				const data = await response.json();
-				if (!data || data.status !== 0) {
-					throw new Error((data && data.message) ? data.message : 'JShaman 返回状态异常');
-				}
-				const obfuscated = String(data.content || '');
-				if (!obfuscated) {
-					throw new Error('JShaman 返回内容为空');
-				}
-				return obfuscated;
-			} finally {
-				clearTimeout(timeoutId);
-			}
-		}
-
-		// 停止按钮颤抖并清理释放态残留（幂等安全）
-		function stopVersionCopyEasterEggShake() {
-			const button = document.getElementById('versionCopyBtn') || document.querySelector('.btn-version-copy');
-			if (button) {
-				button.classList.remove('easter-egg-shaking', 'egg-release');
-			}
-		}
-
-		// 按钮轻弹释放：混淆成功瞬间轻微弹一下（克制，不过冲），播放结束后移除类以恢复常态
-		function playVersionCopyRelease(button) {
-			if (!button) return;
-			button.classList.remove('egg-release');
-			void button.offsetWidth; // 强制 reflow，确保动画可重播
-			button.classList.add('egg-release');
-			const removeRelease = () => button.classList.remove('egg-release');
-			button.addEventListener('animationend', removeRelease, { once: true });
-			setTimeout(removeRelease, 500);
-		}
-
-		// 长按满 618ms 后触发：颤抖按钮并调用 JShaman 混淆，完成后复制混淆源码
-		async function startVersionCopyEasterEgg() {
-			const source = String(cachedWorkerVersionRawText || '');
-			const button = document.getElementById('versionCopyBtn') || document.querySelector('.btn-version-copy');
-
-			if (!source) {
-				versionCopyEasterEggActive = true;
-				versionCopyEasterEggDone = true;
-				stopVersionCopyEasterEggShake();
-				showToast('暂无可混淆的最新 Worker.js 源码', 'error');
-				return;
-			}
-
-			// 免费版限制：提交代码量限 512KB（按字节数计算，source.length 为 UTF-16 字符数而非字节数）
-			const sourceBytes = new TextEncoder().encode(source).length;
-			if (sourceBytes > JSHAMAN_FREE_MAX_BYTES) {
-				versionCopyEasterEggActive = true;
-				versionCopyEasterEggDone = true;
-				stopVersionCopyEasterEggShake();
-				const copied = await copyTextToClipboard(source);
-				showToast(copied ? '源码超过免费版 512KB 限制，已复制原始源码' : '源码超过免费版 512KB 限制，复制原始源码失败', 'error');
-				return;
-			}
-
-			versionCopyEasterEggActive = true;
-			versionCopyRequestInFlight = true;
-			if (button) {
-				button.classList.remove('egg-release');
-				button.classList.add('easter-egg-shaking');
-			}
-			console.log('[Version] 长按彩蛋触发，开始 JShaman 混淆...');
-
-			try {
-				const obfuscated = await obfuscateWorkerSourceWithJShaman(source);
-				versionCopyRequestInFlight = false;
-				versionCopyEasterEggDone = true;
-				stopVersionCopyEasterEggShake();
-				playVersionCopyRelease(button);
-				console.log('[Version] JShaman 混淆成功，已复制混淆源码');
-
-				const copied = await copyTextToClipboard(obfuscated);
-				if (copied) {
-					showToast('🎉 已复制混淆后的 Worker.js 源码到剪贴板', 'success');
-				} else {
-					showToast('混淆成功，但复制失败，请手动复制源码', 'error');
-				}
-			} catch (error) {
-				versionCopyRequestInFlight = false;
-				versionCopyEasterEggDone = true;
-				stopVersionCopyEasterEggShake();
-				if (versionCopyUserReleased) return; // 用户中途放手已回退，无需重复处理
-
-				console.error('[Version] JShaman 混淆失败:', error);
-				const copied = await copyTextToClipboard(source);
-				showToast(copied ? '混淆失败，已复制原始源码' : '混淆失败，复制原始源码也失败', 'error');
-			}
-		}
-
-		// pointerdown：启动 618ms 长按定时器（触发前按钮保持静止，618ms 到点后由 startVersionCopyEasterEgg 开始颤抖）
-		function onVersionCopyPointerDown(event) {
-			// 仅响应主按键（左键/触摸/笔），避免右键等干扰
-			if (event && event.button !== undefined && event.button !== 0) return;
-			if (versionCopyRequestInFlight) return; // 混淆请求进行中，忽略新的按压
-
-			versionCopyPressActive = true;
-			versionCopyEasterEggActive = false;
-			versionCopyEasterEggDone = false;
-			versionCopyUserReleased = false;
-			clearTimeout(versionCopyPressTimer);
-			versionCopyPressTimer = setTimeout(() => {
-				startVersionCopyEasterEgg();
-			}, VERSION_COPY_LONG_PRESS_MS);
-		}
-
-		// pointerup / pointerleave / pointercancel：结束按压
-		function onVersionCopyPointerEnd(event) {
-			if (!versionCopyPressActive) return;
-			versionCopyPressActive = false;
-			clearTimeout(versionCopyPressTimer);
-			versionCopyPressTimer = null;
-			stopVersionCopyEasterEggShake(); // 清理颤抖阶段类（彩蛋未触发/已完成/已回退时均幂等安全）
-
-			if (versionCopyEasterEggActive && versionCopyRequestInFlight) {
-				// 彩蛋已触发但仍在等待后端：三种结束事件均视为放弃
-				// 中止请求、停止抖动、复制原始源码
-				versionCopyUserReleased = true;
-				if (versionCopyAbortController) versionCopyAbortController.abort();
-				versionCopyRequestInFlight = false;
-				stopVersionCopyEasterEggShake();
-				versionCopyLastPointerHandledAt = Date.now();
-				copyOriginalWorkerSourceWithToast();
-				return;
-			}
-
-			if (versionCopyEasterEggActive && versionCopyEasterEggDone) {
-				// 彩蛋已完成：混淆结果已复制（或已回退），无需重复操作
-				versionCopyLastPointerHandledAt = Date.now();
-				return;
-			}
-
-			// 彩蛋未触发（618ms 内结束按压）
-			const eventType = event && event.type ? event.type : '';
-			if (eventType === 'pointerleave' || eventType === 'pointercancel') {
-				// 拖出按钮 / 手势取消 = 放弃操作：仅清除定时器，不复制、不弹 toast
-				return;
-			}
-
-			// pointerup（正常点击）：保持原有行为，复制未混淆源码
-			versionCopyLastPointerHandledAt = Date.now();
-			copyOriginalWorkerSourceWithToast();
-		}
-
-		// 初始化：绑定长按彩蛋事件（不影响原有 onclick）
-		function initVersionCopyEasterEgg() {
-			const button = document.getElementById('versionCopyBtn') || document.querySelector('.btn-version-copy');
-			if (!button) return;
-
-			button.addEventListener('pointerdown', onVersionCopyPointerDown);
-			button.addEventListener('pointerup', onVersionCopyPointerEnd);
-			button.addEventListener('pointerleave', onVersionCopyPointerEnd);
-			button.addEventListener('pointercancel', onVersionCopyPointerEnd);
-		}
-
 		function openLatestPagesZipDownload() {
 			const popup = window.open(PAGES_ZIP_DOWNLOAD_URL, '_blank', 'noopener,noreferrer');
 			if (!popup) {
 				showToast('浏览器拦截了新窗口，请允许弹窗后再试', 'warning');
+			}
+		}
+
+		// ==================== 下载 Pages.zip 压缩包 ====================
+		// 原始 GitHub 归档地址会 302 到 codeload.github.com，其响应头 CORS 白名单不含本站，
+		// 跨域 fetch 会被浏览器拦截、<a download> 也会被忽略（落盘名仍是 edgetunnel-main.zip）。
+		// 因此改走支持 CORS(*) 的镜像取字节再以 blob 落盘；原始地址只作为最后的弹窗回退。
+		const PAGES_ZIP_MIRROR_DOMAINS = [
+			'https://github.090227.xyz',
+			'https://github.cmliussss.com',
+			'https://github.cmliussss.net',
+		];
+		let isPagesZipDownloading = false;
+
+		/**
+		 * 把归档原始地址的 https://github.com 前缀替换成镜像前缀。
+		 * 用 ^ 锚定开头，避免误替换路径中出现的其它 github.com 字符。
+		 * @param {string} mirrorDomain 镜像域名，如 'https://github.cmliussss.com'。
+		 * @returns {string} 该镜像下的归档地址。
+		 */
+		function buildPagesZipMirrorUrl(mirrorDomain) {
+			return PAGES_ZIP_DOWNLOAD_URL.replace(/^https:\/\/github\.com/, mirrorDomain + '/github.com');
+		}
+
+		/**
+		 * 从镜像并发拉取最新 Pages 归档，并以 Pages.zip 为文件名保存。
+		 * 全部镜像失败时回退到 openLatestPagesZipDownload() 打开 GitHub 原始链接。
+		 * @returns {Promise<void>} 下载指令已发出（或已提示失败）后 resolve。
+		 */
+		async function downloadLatestPagesZip() {
+			if (isPagesZipDownloading) return;
+
+			isPagesZipDownloading = true;
+			const button = document.getElementById('versionPagesZipDownloadBtn');
+			if (button) {
+				button.disabled = true;
+				button.setAttribute('aria-busy', 'true');
+			}
+
+			const controllers = PAGES_ZIP_MIRROR_DOMAINS.map(() => new AbortController());
+			let hasWinner = false;
+
+			try {
+				showToast('正在准备 Pages.zip…', 'info');
+
+				const requests = PAGES_ZIP_MIRROR_DOMAINS.map((mirrorDomain, index) => (async () => {
+					try {
+						const response = await fetch(buildPagesZipMirrorUrl(mirrorDomain), {
+							signal: controllers[index].signal
+						});
+
+						if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+						const blob = await response.blob();
+						if (blob.size === 0) throw new Error('响应内容为空');
+
+						// 镜像偶发返回 200 的 HTML 错误页，用 zip 魔数（PK）兜住，避免把错误页当压缩包存盘。
+						const head = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
+						if (head.length < 2 || head[0] !== 0x50 || head[1] !== 0x4b) {
+							throw new Error('响应内容不是 zip 压缩包');
+						}
+
+						return { blob, mirrorDomain, index };
+					} catch (error) {
+						if (!(hasWinner && error && error.name === 'AbortError')) {
+							console.warn('[Version] Pages.zip 镜像拉取失败:', mirrorDomain, error && error.message);
+						}
+						throw error;
+					}
+				})());
+
+				let winner = null;
+				try {
+					winner = await Promise.any(requests);
+				} catch (error) {
+					console.warn('[Version] Pages.zip 镜像下载失败，回退原始链接:', error);
+					// 先开窗口再提示：openLatestPagesZipDownload() 内部可能再打一条「弹窗被拦截」，顺序反了会把它盖掉。
+					openLatestPagesZipDownload();
+					showToast('镜像下载失败，已回退 GitHub 原始链接（文件名可能不是 Pages.zip）', 'info');
+					return;
+				}
+
+				// 抢到可用镜像后立刻掐断其余请求，避免无谓流量。
+				hasWinner = true;
+				controllers.forEach((controller, index) => {
+					if (index !== winner.index) {
+						controller.abort();
+					}
+				});
+
+				// 落盘文件名带上最新版本号，与版本弹窗展示的 v2.1.<版本> 保持一致；版本取自页面启动时的缓存，未取到时退回固定名。
+				const latestVersion = Number(cachedLatestOnlineVersion) || 0;
+				const zipFileName = latestVersion > 0 ? `Pages v2.1.${latestVersion}.zip` : 'Pages.zip';
+
+				const blobUrl = URL.createObjectURL(winner.blob);
+				const link = document.createElement('a');
+				link.href = blobUrl;
+				link.download = zipFileName;
+				link.style.display = 'none';
+				document.body.appendChild(link);
+				link.click();
+				link.remove();
+				// 立即回收会让部分浏览器取不到 blob，延迟释放更稳。
+				window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+				console.log('[Version] ' + zipFileName + ' 已触发下载，来源镜像:', winner.mirrorDomain, '字节数:', winner.blob.size);
+				showToast('✅ 已开始下载 ' + zipFileName, 'success');
+			} catch (error) {
+				// 兜底：任何异常都不能冒泡成未捕获错误。
+				console.error('[Version] Pages.zip 下载异常:', error);
+				showToast('下载 Pages.zip 失败，请稍后重试', 'error');
+			} finally {
+				isPagesZipDownloading = false;
+				controllers.forEach((controller) => controller.abort());
+				if (button) {
+					button.disabled = false;
+					button.removeAttribute('aria-busy');
+				}
+			}
+		}
+
+		// ==================== 下载 Worker.js 文件 ====================
+		let isWorkerFileDownloading = false;
+
+		/**
+		 * 把最新 _worker.js 源码保存成本地 worker.js 文件，供用户手动上传到 Cloudflare Workers。
+		 * 优先复用页面启动时缓存的源码；缓存为空时通过镜像并发拉取。
+		 * @returns {Promise<void>} 下载指令已发出（或已提示失败）后 resolve。
+		 */
+		async function downloadLatestWorkerFile() {
+			if (isWorkerFileDownloading) return;
+
+			isWorkerFileDownloading = true;
+			const button = document.getElementById('versionWorkerDownloadBtn');
+			if (button) {
+				button.disabled = true;
+				button.setAttribute('aria-busy', 'true');
+			}
+
+			try {
+				let source = String(cachedWorkerVersionRawText || '');
+				const fromCache = source.length > 0;
+
+				if (!source) {
+					try {
+						const fetched = await fetchWithAutoMirror(
+							WORKER_VERSION_SOURCE_URL + '?_t=' + Date.now(),
+							'Worker 主程序'
+						);
+						source = String(fetched || '');
+					} catch (fetchError) {
+						console.error('[Version] 拉取 Worker.js 源码失败:', fetchError);
+						showToast('获取 Worker.js 源码失败，请检查网络后重试', 'error');
+						return;
+					}
+				}
+
+				// 镜像偶发返回 200 的 HTML 错误页，必须拦在下载之前；
+				// 且校验必须早于写缓存，否则错误页会被缓存，本次会话再也拉不到正确内容。
+				if (!source.trim() || /^\s*<(!doctype|html)/i.test(source)) {
+					console.error('[Version] Worker.js 内容异常，字符数:', source.length);
+					showToast('获取到的 Worker.js 内容异常，请稍后重试', 'error');
+					return;
+				}
+
+				// 走到这里内容才可信，此时才允许回写缓存（fromCache 为真时缓存已是同一份内容）。
+				if (!fromCache) {
+					cachedWorkerVersionRawText = source;
+				}
+
+				const blob = new Blob([source], { type: 'text/javascript;charset=utf-8' });
+				const blobUrl = URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = blobUrl;
+				link.download = 'worker.js';
+				link.style.display = 'none';
+				document.body.appendChild(link);
+				link.click();
+				link.remove();
+				// 立即回收会让部分浏览器取不到 blob，延迟释放更稳。
+				window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+				console.log('[Version] worker.js 已触发下载，来源:', fromCache ? '缓存' : '镜像拉取', '字符数:', source.length);
+				showToast('✅ 已开始下载 worker.js', 'success');
+			} catch (error) {
+				console.error('[Version] 下载 worker.js 失败:', error);
+				showToast('下载 worker.js 失败，请稍后重试', 'error');
+			} finally {
+				isWorkerFileDownloading = false;
+				if (button) {
+					button.disabled = false;
+					button.removeAttribute('aria-busy');
+				}
 			}
 		}
 
@@ -20810,6 +23062,7 @@
 			const formatInlineText = (text) => {
 				return escapeMarkdownHtml(text)
 					.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+					.replace(/~~([^~]+)~~/g, '<del>$1</del>')
 					.replace(/`([^`]+)`/g, '<code>$1</code>');
 			};
 
@@ -21117,6 +23370,68 @@
 			return new Date(timestamp).toLocaleString('zh-CN', { hour12: false });
 		}
 
+		/* 图例跳转：把"最新版本 / 当前使用"变成定位入口，省得用户手翻长列表 */
+		function syncChangelogLegendState() {
+			const contentEl = document.getElementById('versionChangelogContent');
+			const legendItems = document.querySelectorAll('.version-legend-item[data-jump]');
+			if (!contentEl || !legendItems.length) return;
+
+			const latestRow = contentEl.querySelector('.changelog-version-row.is-latest');
+			const currentRow = contentEl.querySelector('.changelog-version-row.is-current');
+			const hasLatest = !!latestRow;
+			const hasCurrent = !!currentRow;
+
+			legendItems.forEach(item => {
+				const kind = item.getAttribute('data-jump');
+				const available = kind === 'latest' ? hasLatest : hasCurrent;
+				item.disabled = !available;
+				if (kind === 'current') {
+					// 当前版本恰好就是最新版本时它在最上方，箭头要翻过来
+					const sameAsLatest = !!(currentRow && latestRow && currentRow === latestRow);
+					item.setAttribute('data-dir', sameAsLatest ? 'up' : 'down');
+				}
+				if (available) {
+					item.removeAttribute('title');
+				} else {
+					item.title = kind === 'latest' ? '更新日志尚未加载完成' : '当前版本不在更新日志条目中';
+				}
+			});
+		}
+
+		function jumpToChangelogEntry(kind) {
+			const contentEl = document.getElementById('versionChangelogContent');
+			if (!contentEl) return;
+
+			const selector = kind === 'current'
+				? '.changelog-version-row.is-current'
+				: '.changelog-version-row.is-latest';
+			const target = contentEl.querySelector(selector);
+			if (!target) {
+				syncChangelogLegendState();
+				return;
+			}
+
+			const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const topOffset = 10;
+			const delta = target.getBoundingClientRect().top
+				- contentEl.getBoundingClientRect().top
+				+ contentEl.scrollTop
+				- topOffset;
+
+			contentEl.scrollTo({
+				top: Math.max(0, delta),
+				behavior: reduceMotion ? 'auto' : 'smooth'
+			});
+
+			// 重复点击同一入口时也要重放描边动画
+			target.classList.remove('is-jump-target');
+			void target.offsetWidth;
+			target.classList.add('is-jump-target');
+			window.setTimeout(() => target.classList.remove('is-jump-target'), 1500);
+
+			console.log(`[更新日志] 已定位到${kind === 'current' ? '当前使用版本' : '最新版本'}所在行`);
+		}
+
 		async function loadVersionChangelog(forceReload = false) {
 			const contentEl = document.getElementById('versionChangelogContent');
 			if (!contentEl) return;
@@ -21124,6 +23439,7 @@
 			if (!forceReload && cachedChangelogRawText) {
 				const renderResult = renderChangelogMarkdown(cachedChangelogRawText);
 				contentEl.innerHTML = renderResult.html || '<p class="version-changelog-placeholder">暂无更新日志内容。</p>';
+				syncChangelogLegendState();
 				const cachedAtText = formatVersionChangelogTime(cachedChangelogLoadedAt);
 				if (cachedAtText) {
 					console.log(`[请求RAW] 使用缓存更新日志，上次加载时间=${cachedAtText}`);
@@ -21148,6 +23464,7 @@
 
 			console.log('[请求RAW] 进度: 正在拉取更新日志');
 			contentEl.innerHTML = '<p class="version-changelog-placeholder">正在加载更新日志...</p>';
+			syncChangelogLegendState();
 
 			pendingChangelogLoadPromise = (async () => {
 				try {
@@ -21157,6 +23474,7 @@
 
 					const renderResult = renderChangelogMarkdown(changelogText);
 					contentEl.innerHTML = renderResult.html || '<p class="version-changelog-placeholder">暂无更新日志内容。</p>';
+					syncChangelogLegendState();
 					console.log(`[请求RAW] 成功: 更新日志已加载，时间=${formatVersionChangelogTime(cachedChangelogLoadedAt)}`);
 					if (renderResult.currentVersionPosition > 0) {
 						console.log(
@@ -21170,6 +23488,7 @@
 				} catch (error) {
 					console.error('[请求RAW] 更新日志拉取失败:', error);
 					contentEl.innerHTML = '<p class="version-changelog-placeholder">更新日志拉取失败，请稍后重试。</p>';
+					syncChangelogLegendState();
 					showToast('更新日志加载失败: ' + error.message, 'error');
 				} finally {
 					pendingChangelogLoadPromise = null;
@@ -23658,6 +25977,8 @@
 			};
 		}
 
+		// 面板里的 TG WEB 代理入口已迁移到页脚 Telegram 图标彩蛋（长按 1s 触发），
+		// 这个函数保留下来配合版本号刷新，DOM 已不存在，开头的自守卫会直接 return。
 		function updateTGWebProxyField() {
 			const group = document.getElementById('tgWebProxyGroup');
 			const input = document.getElementById('tgWebProxyLink');
@@ -23698,6 +26019,677 @@
 			}
 		}
 
+		// ===== 页脚 Telegram 图标彩蛋 =====
+		// 入口从「📋 获取节点链接」面板迁移至此，版本号不达标的站点长按完全无反应。
+		//
+		// 【时间轴】下面 8 个参数单位都是毫秒，除 HOLD 外全是「相对上一个节点」的延迟，
+		// 改一个会连带后面整体平移，调的时候对着这张表算：
+		//   开始抖动  = HOLD
+		//   振幅加大  = HOLD + HOT_DELAY
+		//   喷第一枚  = HOLD + FOUNTAIN_DELAY + FIRST_EMOJI
+		//   爆开      = 上一行 + FOUNTAIN_MS
+		//   弹窗出现  = 上一行 + PANEL_DELAY
+		// 当前值代入：1000 → 1750 → 2620 → 4120 → 4370ms
+
+		// 长按多久才算触发，唯一从「手指按下」起算的绝对值。
+		// 太短手指滑动时容易误触，太长用户以为没反应就松手了；这段是刻意零反馈的。
+		// 建议 600–1600。
+		const TG_EGG_HOLD_MS = 618;
+
+		// 抖动开始后多久把振幅从 ±1.5px 提到 ±2.5px（即切到 tg-egg-hot 的时刻）。
+		// 只影响「抖得更猛」的时点，与喷泉无关。建议取 HOLD 的 30%–60%。
+		const TG_EGG_HOT_DELAY_MS = 750;
+
+		// 抖动开始后多久进入喷泉阶段（此时图标仍在抖，只是叠了一层光晕）。
+		// 必须 ≥ HOT_DELAY_MS，否则还没加幅就直接开喷。想缩短总时长优先压这个。
+		const TG_EGG_FOUNTAIN_DELAY_MS = 1382;
+
+		// 进入喷泉阶段后隔多久喷出第一枚 emoji，越大越像「先蓄一口再喷」。
+		// 它会计入爆开时间，建议 0–200。
+		const TG_EGG_FOUNTAIN_FIRST_EMOJI_MS = 120;
+
+		// 喷泉持续多久，时间一到立刻爆开。想拉长「喷」的观感就加这个。
+		// 建议 800–3000，太长会变成只有喷没有炸。
+		const TG_EGG_FOUNTAIN_MS = 618;
+
+		// 喷泉的发射间隔，越小喷得越密；从 START 线性过渡到 END。
+		// START 是刚开喷时的间隔、END 是快结束时，所以 START > END 才是「越喷越急」。
+		// 当前约等于每秒 12 枚 → 18 枚；手机端再往下压会明显掉帧。
+		const TG_EGG_EMOJI_INTERVAL_START_MS = 83;
+		const TG_EGG_EMOJI_INTERVAL_END_MS = 56;
+
+		// 爆开后多久弹出面板。0 = 爆炸与弹窗同时发生（容易糊在一起），
+		// 250 约 15 帧，刚好看清冲击环炸开再接面板。建议 0–600。
+		const TG_EGG_PANEL_DELAY_MS = 250;
+		const TG_EGG_BURST_EMOJI_COUNT = 18;
+		const TG_EGG_BURST_PARTICLE_COUNT = 16;
+		const TG_EGG_MOVE_CANCEL_PX = 8;
+		const TG_EGG_EMOJI_POOL = ['✈️', '✈️', '✈️', '✨', '✨', '⚡️', '📨', '💌', '🌐'];
+		// 品牌橙 + 品牌蓝，禁止彩虹色
+		const TG_EGG_PARTICLE_HUES = [28, 24, 42, 200, 196];
+		// 粒子作用域类：挂到 body 上把本次彩蛋的粒子压到低于弹窗遮罩的层级，
+		// 不改 .uuid-* 原规则，避免影响 UUID 火箭彩蛋
+		const TG_EGG_FX_LAYER_CLASS = 'tg-egg-fx-layer';
+		// 喷泉粒子的宿主层：挂进 .card-container 且排在社交图标之前，
+		// 靠「同一档内 DOM 在后的画在上面」让图标盖住粒子（详见 CSS 里的说明）
+		const TG_EGG_FOUNTAIN_LAYER_CLASS = 'tg-egg-fountain-layer';
+		const TG_EGG_FX_LAYER_LINGER_MS = 1800;
+		const TG_EGG_CLOSE_GUARD_MS = 450;
+
+		let tgEggState = 'idle';
+		let tgEggPointerId = null;
+		let tgEggStartX = 0;
+		let tgEggStartY = 0;
+		let tgEggSuppressClick = false;
+		let tgEggTimers = [];
+		let tgEggFountainTimer = 0;
+		// 喷泉粒子宿主层，一次彩蛋只建一个，teardown 时连同余留粒子一起摘掉
+		let tgEggFountainLayer = null;
+		let tgEggInitialized = false;
+		// 面板弹出时刻：触摸端 touchend 会补一个 click，落点此时已被遮罩覆盖，
+		// 不挡这 450ms 的话刚弹出的面板会被自己的关闭判定关掉
+		let tgEggPanelOpenedAt = 0;
+		// 只有「面板打开之后在遮罩上重新按下过」才算用户真的点了遮罩。
+		// 触摸端的兼容 click 不会补 pointerdown，所以长按后隔多久松手都不会误关
+		let tgEggOverlayTapArmed = false;
+
+		function tgEggGetLinkEl() {
+			return document.getElementById('tgEasterEggLink');
+		}
+
+		function tgEggSchedule(fn, delay) {
+			const id = window.setTimeout(() => {
+				tgEggTimers = tgEggTimers.filter((timerId) => timerId !== id);
+				fn();
+			}, delay);
+			tgEggTimers.push(id);
+			return id;
+		}
+
+		function tgEggClearTimers() {
+			tgEggTimers.forEach((id) => window.clearTimeout(id));
+			tgEggTimers = [];
+			if (tgEggFountainTimer) {
+				window.clearTimeout(tgEggFountainTimer);
+				tgEggFountainTimer = 0;
+			}
+		}
+
+		function tgEggResetVisuals() {
+			const link = tgEggGetLinkEl();
+			if (link) {
+				link.classList.remove('tg-egg-holding', 'tg-egg-shaking', 'tg-egg-hot', 'tg-egg-glowing');
+			}
+		}
+
+		function tgEggTeardown() {
+			tgEggClearTimers();
+			tgEggResetVisuals();
+			if (document.body) document.body.classList.remove(TG_EGG_FX_LAYER_CLASS);
+			tgEggDropFountainLayer();
+			tgEggState = 'idle';
+			tgEggPointerId = null;
+		}
+
+		function tgEggVibrate(pattern) {
+			try {
+				if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+					navigator.vibrate(pattern);
+				}
+			} catch (error) {
+				// iOS Safari 等环境不支持振动，忽略即可
+				console.warn('[TG Easter Egg] 振动不可用:', error);
+			}
+		}
+
+		function tgEggPrefersReducedMotion() {
+			try {
+				return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+			} catch (error) {
+				return false;
+			}
+		}
+
+		function tgEggIsLowPerformance() {
+			return document.documentElement.classList.contains('low-performance-mode');
+		}
+
+		function tgEggGetOrigin() {
+			const link = tgEggGetLinkEl();
+			if (link) {
+				const rect = link.getBoundingClientRect();
+				if (rect.width > 0 && rect.height > 0) {
+					return {
+						x: rect.left + rect.width / 2,
+						y: rect.top + rect.height / 2
+					};
+				}
+			}
+			return {
+				x: window.innerWidth / 2,
+				y: window.innerHeight * 0.8
+			};
+		}
+
+		// 喷泉粒子的宿主层：挂进 .card-container，且 DOM 排在社交图标之前。
+		// 建不出来（页面结构被改过）就返回 null，调用方退回 body + 视口坐标，
+		// 表现与改动前一致 —— 只是粒子又盖在图标之上了。
+		function tgEggGetFountainLayer() {
+			if (tgEggFountainLayer && tgEggFountainLayer.isConnected) return tgEggFountainLayer;
+
+			const link = tgEggGetLinkEl();
+			const host = link ? link.closest('.card-container') : null;
+			if (!host) return null;
+
+			const layer = document.createElement('div');
+			layer.className = TG_EGG_FOUNTAIN_LAYER_CLASS;
+			layer.setAttribute('aria-hidden', 'true');
+			// 关键：必须插在社交图标那一段之前。粒子和图标同处 z-index:0 这一档，
+			// 同档内 DOM 在后的先绘制，插到图标后面就又跑回图标上面了
+			const socialLinks = host.querySelector('.social-links');
+			if (socialLinks && socialLinks.parentElement === host) {
+				host.insertBefore(layer, socialLinks);
+			} else {
+				host.insertBefore(layer, host.firstChild);
+			}
+			tgEggFountainLayer = layer;
+			return layer;
+		}
+
+		function tgEggDropFountainLayer() {
+			if (!tgEggFountainLayer) return;
+			tgEggFountainLayer.remove();
+			tgEggFountainLayer = null;
+		}
+
+		function tgEggSpawnFountainEmoji() {
+			const origin = tgEggGetOrigin();
+			// 有宿主层就换算成卡片局部坐标（层与卡片同尺寸同原点），
+			// 拿不到就退回改动前的 body + 视口坐标
+			const layer = tgEggGetFountainLayer();
+			let baseX = origin.x;
+			let baseY = origin.y;
+			if (layer) {
+				const box = layer.getBoundingClientRect();
+				baseX = origin.x - box.left;
+				baseY = origin.y - box.top;
+			}
+
+			const node = document.createElement('span');
+			node.className = 'uuid-gift-fx';
+			node.textContent = TG_EGG_EMOJI_POOL[Math.floor(Math.random() * TG_EGG_EMOJI_POOL.length)];
+			node.style.left = (baseX + (Math.random() * 18 - 9)).toFixed(1) + 'px';
+			node.style.top = (baseY + (Math.random() * 8 - 4)).toFixed(1) + 'px';
+			// 原生 .uuid-gift-fx 是 24px，对 44px 的图标来说太大，这里压到 12~20px
+			node.style.fontSize = (12 + Math.random() * 8).toFixed(1) + 'px';
+			node.style.setProperty('--gift-x-drift', (Math.random() * 90 - 45).toFixed(1) + 'px');
+			node.style.setProperty('--gift-y-lift', (140 + Math.random() * 40).toFixed(1) + 'px');
+			node.style.setProperty('--gift-rotate', (Math.random() * 70 - 35).toFixed(1) + 'deg');
+			node.style.setProperty('--gift-duration', (640 + Math.random() * 240).toFixed(0) + 'ms');
+			(layer || document.body).appendChild(node);
+			window.setTimeout(() => node.remove(), 1300);
+		}
+
+		function tgEggSpawnBurst() {
+			if (tgEggPrefersReducedMotion()) return;
+			const origin = tgEggGetOrigin();
+			const lowPerformance = tgEggIsLowPerformance();
+
+			// 全屏闪白在低性能模式下直接跳过
+			if (!lowPerformance) {
+				const flash = document.createElement('div');
+				flash.className = 'uuid-firework-flash';
+				flash.style.left = origin.x.toFixed(1) + 'px';
+				flash.style.top = origin.y.toFixed(1) + 'px';
+				document.body.appendChild(flash);
+				window.setTimeout(() => flash.remove(), 700);
+			}
+
+			// 双冲击环：第二环延后 120ms 出，做出「双响」的层次
+			[0, 120].forEach((delay) => {
+				window.setTimeout(() => {
+					const ring = document.createElement('div');
+					ring.className = 'uuid-firework-ring';
+					ring.style.left = origin.x.toFixed(1) + 'px';
+					ring.style.top = origin.y.toFixed(1) + 'px';
+					document.body.appendChild(ring);
+					window.setTimeout(() => ring.remove(), 1000);
+				}, delay);
+			});
+
+			const emojiCount = lowPerformance ? Math.round(TG_EGG_BURST_EMOJI_COUNT / 2) : TG_EGG_BURST_EMOJI_COUNT;
+			for (let i = 0; i < emojiCount; i++) {
+				const angle = (Math.PI * 2 * i) / emojiCount + (Math.random() * 0.16 - 0.08);
+				const distance = 40 + Math.random() * 56;
+				const node = document.createElement('span');
+				node.className = 'tg-egg-burst-emoji';
+				node.textContent = TG_EGG_EMOJI_POOL[Math.floor(Math.random() * TG_EGG_EMOJI_POOL.length)];
+				node.style.left = origin.x.toFixed(1) + 'px';
+				node.style.top = origin.y.toFixed(1) + 'px';
+				node.style.fontSize = (16 + Math.random() * 12).toFixed(1) + 'px';
+				node.style.setProperty('--dx', (Math.cos(angle) * distance).toFixed(1) + 'px');
+				node.style.setProperty('--dy', (Math.sin(angle) * distance).toFixed(1) + 'px');
+				node.style.setProperty('--rot', (Math.random() * 60 - 30).toFixed(1) + 'deg');
+				node.style.setProperty('--tg-egg-duration', (780 + Math.random() * 400).toFixed(0) + 'ms');
+				document.body.appendChild(node);
+				window.setTimeout(() => node.remove(), 1400);
+			}
+
+			const particleCount = lowPerformance ? Math.round(TG_EGG_BURST_PARTICLE_COUNT / 2) : TG_EGG_BURST_PARTICLE_COUNT;
+			const burst = document.createElement('div');
+			burst.className = 'uuid-firework-burst';
+			burst.style.left = origin.x.toFixed(1) + 'px';
+			burst.style.top = origin.y.toFixed(1) + 'px';
+			for (let i = 0; i < particleCount; i++) {
+				const angle = (Math.PI * 2 * i) / particleCount + (Math.random() * 0.2 - 0.1);
+				const distance = 40 + Math.random() * 56;
+				const particle = document.createElement('span');
+				particle.className = 'uuid-firework-particle';
+				particle.style.setProperty('--dx', (Math.cos(angle) * distance).toFixed(1) + 'px');
+				particle.style.setProperty('--dy', (Math.sin(angle) * distance).toFixed(1) + 'px');
+				particle.style.setProperty('--hue', String(TG_EGG_PARTICLE_HUES[i % TG_EGG_PARTICLE_HUES.length]));
+				particle.style.setProperty('--particle-duration', (780 + Math.random() * 400).toFixed(0) + 'ms');
+				burst.appendChild(particle);
+			}
+			document.body.appendChild(burst);
+			window.setTimeout(() => burst.remove(), 1500);
+		}
+
+		function tgEggStartFountain() {
+			if (tgEggState !== 'fountain') return;
+			const startedAt = Date.now();
+			tgEggSchedule(tgEggEnterBurst, TG_EGG_FOUNTAIN_MS);
+
+			const tick = () => {
+				if (tgEggState !== 'fountain') return;
+				tgEggSpawnFountainEmoji();
+				const ratio = Math.min(1, (Date.now() - startedAt) / TG_EGG_FOUNTAIN_MS);
+				// 12 枚/秒 → 18 枚/秒，越喷越急
+				const interval = TG_EGG_EMOJI_INTERVAL_START_MS
+					+ (TG_EGG_EMOJI_INTERVAL_END_MS - TG_EGG_EMOJI_INTERVAL_START_MS) * ratio;
+				tgEggFountainTimer = window.setTimeout(tick, interval);
+			};
+			tick();
+		}
+
+		function tgEggEnterHot() {
+			if (tgEggState !== 'shaking') return;
+			const link = tgEggGetLinkEl();
+			if (link) link.classList.add('tg-egg-hot');
+		}
+
+		function tgEggEnterFountain() {
+			if (tgEggState !== 'shaking') return;
+			tgEggState = 'fountain';
+			const link = tgEggGetLinkEl();
+			if (link) {
+				// 抖动全程不停：这里只叠加光晕，不能移除 shaking/hot，
+				// 否则喷泉一开始图标就定住了
+				link.classList.add('tg-egg-glowing');
+			}
+			tgEggSchedule(tgEggStartFountain, TG_EGG_FOUNTAIN_FIRST_EMOJI_MS);
+		}
+
+		function tgEggEnterShaking() {
+			if (tgEggState !== 'holding') return;
+			tgEggState = 'shaking';
+			// 过了 1000ms 就算「已触发」，这次点击要吞掉，否则会跳转 t.me
+			tgEggSuppressClick = true;
+
+			const link = tgEggGetLinkEl();
+			if (link) {
+				link.classList.remove('tg-egg-holding');
+				link.classList.add('tg-egg-shaking');
+			}
+			tgEggVibrate(12);
+
+			if (tgEggPrefersReducedMotion()) {
+				// 用户显式要求减少动效：长按判定通过后直接开面板
+				tgEggSchedule(tgEggOpenPanel, 200);
+				return;
+			}
+			tgEggSchedule(tgEggEnterHot, TG_EGG_HOT_DELAY_MS);
+			tgEggSchedule(tgEggEnterFountain, TG_EGG_FOUNTAIN_DELAY_MS);
+		}
+
+		function tgEggEnterBurst() {
+			if (tgEggState !== 'fountain') return;
+			if (tgEggFountainTimer) {
+				window.clearTimeout(tgEggFountainTimer);
+				tgEggFountainTimer = 0;
+			}
+			tgEggState = 'burst';
+			// 爆开阶段不再给图标加缩放动画（.tg-egg-burst）：那会和抖动抢 transform，
+			// 让图标在爆炸那一下定住。抖动保持到面板弹出为止。
+			tgEggVibrate([20, 40, 20]);
+			tgEggSpawnBurst();
+			tgEggSchedule(tgEggOpenPanel, TG_EGG_PANEL_DELAY_MS);
+		}
+
+		function tgEggShowQRFallback(host, message) {
+			host.classList.add('is-fallback');
+			const tip = document.createElement('p');
+			tip.className = 'tg-proxy-qrfallback';
+			tip.textContent = message;
+			host.appendChild(tip);
+		}
+
+		function tgEggRenderQR(text) {
+			const host = document.getElementById('tgEasterEggQr');
+			if (!host) return;
+			host.innerHTML = '';
+			host.classList.remove('is-fallback');
+
+			// QRCode 是异步加载的，缺席时只降级，绝不抛错打断弹窗
+			if (typeof QRCode === 'undefined') {
+				tgEggShowQRFallback(host, '二维码组件未加载，请复制下方链接导入');
+				return;
+			}
+
+			try {
+				const correctLevel = (QRCode.CorrectLevel && typeof QRCode.CorrectLevel.M !== 'undefined')
+					? QRCode.CorrectLevel.M
+					: 0;
+				new QRCode(host, {
+					text: text,
+					width: 148,
+					height: 148,
+					colorDark: '#0f172a',
+					colorLight: '#ffffff',
+					correctLevel: correctLevel
+				});
+			} catch (error) {
+				console.warn('[TG Easter Egg] 二维码生成失败:', error);
+				host.innerHTML = '';
+				tgEggShowQRFallback(host, '二维码生成失败，请复制下方链接导入');
+			}
+		}
+
+		function tgEggFillPanel(params) {
+			const serverEl = document.getElementById('tgEasterEggServer');
+			const secretEl = document.getElementById('tgEasterEggSecret');
+			const importInput = document.getElementById('tgEasterEggImportInput');
+			const shareInput = document.getElementById('tgEasterEggShareInput');
+			if (serverEl) serverEl.textContent = params.server;
+			if (secretEl) secretEl.textContent = params.secret;
+			if (importInput) importInput.value = params.importUrl;
+			if (shareInput) shareInput.value = params.shareUrl;
+			tgEggRenderQR(params.importUrl);
+		}
+
+		function tgEggOpenPanel() {
+			if (tgEggState === 'idle') return;
+			tgEggTeardown();
+
+			const params = getTGWebProxyParams();
+			if (!params) {
+				showToast('缺少 UUID，无法生成 TG WEB 代理链接', 'error');
+				return;
+			}
+			tgEggFillPanel(params);
+
+			const overlay = document.getElementById('tgEasterEggModal');
+			if (!overlay) return;
+			overlay.classList.add('show');
+			tgEggPanelOpenedAt = Date.now();
+			tgEggOverlayTapArmed = false;
+			// 上面 teardown 已经把作用域类摘掉了，这里重新挂回来：让面板初开那一瞬仍在飞的余留粒子
+			// 继续压在弹窗之下（否则会突然跳到 9e9 层级盖住面板），1.8s 后它们消散再移除；
+			// 若这期间又起了新一轮长按，就跳过移除，交给那次自己的 teardown 处理
+			document.body.classList.add(TG_EGG_FX_LAYER_CLASS);
+			tgEggSchedule(() => {
+				if (tgEggState !== 'idle') return;
+				document.body.classList.remove(TG_EGG_FX_LAYER_CLASS);
+			}, TG_EGG_FX_LAYER_LINGER_MS);
+			const closeBtn = overlay.querySelector('.tg-proxy-close');
+			if (closeBtn && typeof closeBtn.focus === 'function') {
+				try {
+					closeBtn.focus({ preventScroll: true });
+				} catch (error) {
+					closeBtn.focus();
+				}
+			}
+		}
+
+		function tgEggCopyTextFallback(text) {
+			let textarea = null;
+			try {
+				textarea = document.createElement('textarea');
+				textarea.value = text;
+				textarea.setAttribute('readonly', 'readonly');
+				textarea.style.position = 'fixed';
+				textarea.style.left = '-9999px';
+				textarea.style.top = '0';
+				document.body.appendChild(textarea);
+				textarea.select();
+				textarea.setSelectionRange(0, text.length);
+				return !!document.execCommand('copy');
+			} catch (error) {
+				return false;
+			} finally {
+				if (textarea) textarea.remove();
+			}
+		}
+
+		function tgEggCopyText(text) {
+			if (!text) return Promise.resolve(false);
+			try {
+				if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function' && window.isSecureContext) {
+					return navigator.clipboard.writeText(text).then(() => true).catch(() => tgEggCopyTextFallback(text));
+				}
+			} catch (error) {
+				return Promise.resolve(tgEggCopyTextFallback(text));
+			}
+			return Promise.resolve(tgEggCopyTextFallback(text));
+		}
+
+		function tgEggMarkRowCopied(row) {
+			row.classList.add('is-copied');
+			if (row.__tgEggCopyTimer) window.clearTimeout(row.__tgEggCopyTimer);
+			row.__tgEggCopyTimer = window.setTimeout(() => {
+				row.classList.remove('is-copied');
+				row.__tgEggCopyTimer = 0;
+			}, 1400);
+		}
+
+		// 彩蛋弹窗内不复用全局 toast，避免「弹窗里再弹一个弹窗」的视觉重复
+		function tgEasterEggCopyRow(row) {
+			if (!row) return;
+			const input = row.querySelector('input');
+			if (!input) return;
+			const text = String(input.value || '');
+			if (!text) return;
+
+			tgEggCopyText(text).then((ok) => {
+				if (!ok) {
+					try {
+						input.select();
+					} catch (error) {
+						// 只读输入框在个别浏览器不可选中，忽略
+					}
+					showToast('复制失败，请手动复制', 'error');
+					return;
+				}
+				tgEggMarkRowCopied(row);
+			});
+		}
+
+		function tgEasterEggCopyRowKey(event, row) {
+			if (!event) return;
+			if (event.key !== 'Enter' && event.key !== ' ') return;
+			event.preventDefault();
+			tgEasterEggCopyRow(row);
+		}
+
+		function tgEasterEggClose(event) {
+			// 触摸端的兼容 click 落在 touchend 坐标，此时那里已被遮罩覆盖，
+			// 会把刚弹出的面板立刻关掉，所以弹窗后 450ms 内忽略「点遮罩」这一路；
+			// × 按钮与 Escape 传入的 event 为空或不是遮罩，不受影响
+			if (event && event.target && event.target.id === 'tgEasterEggModal') {
+				if (Date.now() - tgEggPanelOpenedAt < TG_EGG_CLOSE_GUARD_MS) return;
+				// 手指按太久（面板出现 450ms 之后才松手）时上面那条时间窗就失效了，
+				// 所以再加一道：必须有「打开面板之后新按下遮罩」才算点击遮罩
+				if (!tgEggOverlayTapArmed) return;
+				tgEggOverlayTapArmed = false;
+			}
+			if (event && event.target && event.target.id !== 'tgEasterEggModal') return;
+			const overlay = document.getElementById('tgEasterEggModal');
+			if (!overlay) return;
+
+			overlay.classList.remove('show');
+			overlay.querySelectorAll('.tg-proxy-field.is-copied').forEach((row) => {
+				row.classList.remove('is-copied');
+				if (row.__tgEggCopyTimer) {
+					window.clearTimeout(row.__tgEggCopyTimer);
+					row.__tgEggCopyTimer = 0;
+				}
+			});
+
+			// 焦点回到触发它的 Telegram 图标，键盘操作不丢位置
+			const link = tgEggGetLinkEl();
+			if (link && typeof link.focus === 'function') {
+				try {
+					link.focus({ preventScroll: true });
+				} catch (error) {
+					link.focus();
+				}
+			}
+		}
+
+		function tgEggOnDocumentKeydown(event) {
+			if (!event || event.key !== 'Escape') return;
+			const overlay = document.getElementById('tgEasterEggModal');
+			if (!overlay || !overlay.classList.contains('show')) return;
+			tgEasterEggClose();
+		}
+
+		function tgEggOnPointerDown(event) {
+			// 门禁：版本号未就绪或低于 TG_WEB_PROXY_MIN_VERSION 时彻底无反应
+			if (!tgWebProxyFeatureEnabled) return;
+			if (tgEggState !== 'idle') return;
+			if (event && typeof event.button === 'number' && event.button !== 0) return;
+			if (event && event.isPrimary === false) return;
+
+			const link = tgEggGetLinkEl();
+			if (!link) return;
+
+			// 上一次长按可能没有产生 click（例如手指滑出了图标），这里顺手清掉残留标志
+			tgEggSuppressClick = false;
+			tgEggState = 'holding';
+			tgEggPointerId = event && typeof event.pointerId === 'number' ? event.pointerId : null;
+			tgEggStartX = event && typeof event.clientX === 'number' ? event.clientX : 0;
+			tgEggStartY = event && typeof event.clientY === 'number' ? event.clientY : 0;
+
+			// 本次彩蛋的所有粒子都挂在这一层作用域下，层级压到弹窗遮罩之下
+			document.body.classList.add(TG_EGG_FX_LAYER_CLASS);
+			link.classList.add('tg-egg-holding');
+			tgEggSchedule(tgEggEnterShaking, TG_EGG_HOLD_MS);
+		}
+
+		function tgEggOnPointerMove(event) {
+			if (tgEggState !== 'holding' || !event) return;
+			const dx = event.clientX - tgEggStartX;
+			const dy = event.clientY - tgEggStartY;
+			if (Math.sqrt(dx * dx + dy * dy) > TG_EGG_MOVE_CANCEL_PX) tgEggTeardown();
+		}
+
+		function tgEggOnPointerUp() {
+			// 1000ms 前松手视为放弃；1000ms 之后松手不打断，让它跑完
+			if (tgEggState !== 'holding') return;
+			tgEggTeardown();
+		}
+
+		function tgEggOnPointerCancel() {
+			if (tgEggState === 'idle') return;
+			// 蓄力阶段（还没开始抖）的 pointercancel 基本都是浏览器/系统接管了手势：
+			// iOS 长按链接的画面预览、Android 的系统菜单、手势导航等。这时手指并没有离开屏幕，
+			// 直接 teardown 会让彩蛋在手机上永远触发不了。真被手指拖走的情况，
+			// tgEggOnPointerMove 的 8px 阈值已经先一步处理掉了，这里放行即可。
+			if (tgEggState === 'holding') return;
+			tgEggTeardown();
+		}
+
+		function tgEggOnContextMenu(event) {
+			// 移动端长按 500ms 会弹系统菜单，蓄力期间必须拦掉；idle 时不动它
+			if (tgEggState === 'idle') return;
+			if (event && typeof event.preventDefault === 'function') event.preventDefault();
+		}
+
+		function tgEggOnLinkClick(event) {
+			if (!tgEggSuppressClick) return;
+			tgEggSuppressClick = false;
+			if (event && typeof event.preventDefault === 'function') {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}
+
+		// 长按那次松手时 click 目标可能不在链接上（拖出图标、被遮罩接管……），
+		// link 自己的 click 处理器就跑不到，标志位会一直挂着，把下一次键盘 Enter 也吞掉。
+		// 这里在 document 捕获阶段兜底复位；不能用定时器自动清零——1s 置位、4s 才松手，
+		// 任何短定时器都会让那次本该被吞掉的 click 漏过去跳转。
+		function tgEggOnDocumentClick(event) {
+			if (!tgEggSuppressClick) return;
+			const link = tgEggGetLinkEl();
+			if (link && (event.target === link || link.contains(event.target))) return;
+			tgEggSuppressClick = false;
+		}
+
+		function initTGEasterEgg() {
+			if (tgEggInitialized) return;
+			const link = tgEggGetLinkEl();
+			if (!link) return;
+			tgEggInitialized = true;
+
+			link.addEventListener('pointerdown', tgEggOnPointerDown);
+			// 捕获阶段先拦，确保没有被其它监听器抢先跳转
+			link.addEventListener('click', tgEggOnLinkClick, true);
+			link.addEventListener('contextmenu', tgEggOnContextMenu);
+			window.addEventListener('pointermove', tgEggOnPointerMove);
+			window.addEventListener('pointerup', tgEggOnPointerUp);
+			window.addEventListener('pointercancel', tgEggOnPointerCancel);
+			document.addEventListener('keydown', tgEggOnDocumentKeydown);
+			document.addEventListener('click', tgEggOnDocumentClick, true);
+
+			// 遮罩上的「新手指按下」才给这次点击关窗的资格（见 tgEasterEggClose）
+			const overlay = document.getElementById('tgEasterEggModal');
+			if (overlay) {
+				overlay.addEventListener('pointerdown', () => {
+					tgEggOverlayTapArmed = true;
+				});
+			}
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initTGEasterEgg);
+		} else {
+			initTGEasterEgg();
+		}
+
+		// 页脚的 GitHub / Telegram 是 <a>，移动端长按会被浏览器当成「链接手势」，
+		// 弹出「打开链接 / 复制链接」的系统菜单（主题切换、返回顶部是 <button>，所以没有）。
+		// 这里只拦触摸与触控笔：桌面右键菜单保持原样，"复制链接地址"还能用。
+		function initSocialLinkLongPressGuard() {
+			const links = document.querySelectorAll('.social-links a.social-link');
+			links.forEach((link) => {
+				let lastPointerType = '';
+				link.addEventListener('pointerdown', (event) => {
+					lastPointerType = (event && event.pointerType) ? event.pointerType : '';
+				}, { passive: true });
+				link.addEventListener('contextmenu', (event) => {
+					if (lastPointerType === 'touch' || lastPointerType === 'pen') {
+						event.preventDefault();
+					}
+				});
+			});
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initSocialLinkLongPressGuard);
+		} else {
+			initSocialLinkLongPressGuard();
+		}
+
 		function copySubscription(elementId) {
 			const element = document.getElementById(elementId);
 			navigator.clipboard.writeText(element.value).then(() => {
@@ -23722,6 +26714,117 @@
 			}
 		}
 
+		// 二维码弹窗：elementId → 可读类型名 + 导出文件名
+		// （与页面上 5 个「📱二维码」按钮一一对应）
+		const QRCODE_META = {
+			LinkURL: { label: '节点链接', sub: '单节点 · 导入任意客户端', file: 'node-link' },
+			subLink: { label: '自适应订阅', sub: '按客户端自动下发格式', file: 'auto-sub' },
+			base64Link: { label: 'Base64 订阅', sub: '通用格式 · 手动粘贴导入', file: 'base64-sub' },
+			clashLink: { label: 'Clash 订阅', sub: 'Clash / Mihomo 系客户端', file: 'clash-sub' },
+			singboxLink: { label: 'SingBox 订阅', sub: 'Sing-box 客户端专用', file: 'singbox-sub' }
+		};
+		let qrcodeSourceId = '';
+
+		function getQRCodeModal() {
+			return document.querySelector('#qrcodeModal .qr-modal');
+		}
+
+		// 复原成「有码」形态：每次打开都先复位，避免上一次的错误态残留
+		function resetQRCodeModal() {
+			getQRCodeModal().classList.remove('is-error');
+			document.querySelector('#qrcodeModal .qr-stage').classList.remove('is-empty');
+			document.querySelector('#qrcodeModal .qr-card').hidden = false;
+			document.getElementById('qrcodeError').hidden = true;
+			document.getElementById('qrcodeSaveBtn').disabled = false;
+		}
+
+		// 内容超出二维码容量：复用同一个容器与按钮位，只把图标砖转琥珀
+		function renderQRCodeError(length) {
+			getQRCodeModal().classList.add('is-error');
+			document.querySelector('#qrcodeModal .qr-stage').classList.add('is-empty');
+			document.querySelector('#qrcodeModal .qr-card').hidden = true;
+			document.getElementById('qrcodeError').hidden = false;
+			// 没有码可存，主按钮禁用——点了没反应比灰掉更让人困惑
+			document.getElementById('qrcodeSaveBtn').disabled = true;
+			document.getElementById('qrcodeTitle').textContent = '无法生成二维码';
+			document.getElementById('qrcodeSubtitle').textContent = '内容超出二维码容量上限';
+			document.getElementById('qrcodeErrorTitle').textContent =
+				'链接长度 ' + length.toLocaleString('zh-CN') + ' 字符';
+			document.getElementById('qrcodeErrorDesc').innerHTML =
+				'已超过二维码最大容量。关闭弹窗后，用输入框旁的<strong>「复制订阅」</strong>手动导入。';
+			document.getElementById('qrcodeHint').textContent = '这不是故障，是内容本身的物理限制';
+			// chips 保留（类型 / 长度 / 超限），避免错误态比正常态矮一截造成高度跳动
+			const levelChip = document.getElementById('qrcodeChipLevel');
+			levelChip.textContent = '超出容量';
+			levelChip.classList.remove('is-mute');
+			levelChip.classList.add('is-warn');
+		}
+
+		// 保存二维码：把弹窗里的码导出成 PNG。
+		// 输入框旁边已经有「复制订阅」，弹窗这里的价值是把图存下来发给别人，
+		// 所以只做下载，不再重复一遍复制。
+		function saveQRCode() {
+			const wrap = document.getElementById('qrcodeContainer');
+			const canvas = wrap.querySelector('canvas');
+			const img = wrap.querySelector('img');
+
+			// canvas 才是库真实绘制的那一份（被内联 display:none 藏起来，但像素还在）；
+			// img 只是它的 data URL 副本，放第二顺位兜底。
+			let source = null;
+			let sw = 0;
+			let sh = 0;
+			if (canvas && canvas.width) {
+				source = canvas;
+				sw = canvas.width;
+				sh = canvas.height;
+			} else if (img && img.complete && img.naturalWidth) {
+				source = img;
+				sw = img.naturalWidth;
+				sh = img.naturalHeight;
+			}
+
+			if (!source || !sw || !sh) {
+				showToast('二维码还没生成好，请稍后再试', 'error');
+				return;
+			}
+
+			const meta = QRCODE_META[qrcodeSourceId] || {};
+
+			try {
+				// 2 倍重绘：分享出去在聊天窗里放大也不糊。
+				// 关掉插值让模块保持硬边，插值放大后边缘发灰反而更难扫。
+				const scale = 2;
+				const out = document.createElement('canvas');
+				out.width = sw * scale;
+				out.height = sh * scale;
+				const ctx = out.getContext('2d');
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(0, 0, out.width, out.height);
+				ctx.imageSmoothingEnabled = false;
+				ctx.drawImage(source, 0, 0, out.width, out.height);
+
+				// 用同步的 toDataURL：600×600 的 PNG 只有几十 KB，
+				// 比 toBlob 少一层异步回调，点击后立刻就有结果。
+				const dataUrl = out.toDataURL('image/png');
+				const filename = 'edgetunnel-' + (meta.file || 'qrcode') + '.png';
+
+				const link = document.createElement('a');
+				link.href = dataUrl;
+				link.download = filename;
+				document.body.appendChild(link);
+				link.click();
+				// 立刻移除会让部分浏览器取不到 blob，留一帧再清
+				setTimeout(function () {
+					if (link.parentNode) link.parentNode.removeChild(link);
+				}, 200);
+
+				showToast('二维码已保存', 'success');
+			} catch (error) {
+				console.error('保存二维码失败:', error);
+				showToast('导出失败，请长按二维码图片保存', 'error');
+			}
+		}
+
 		function showQRCode(elementId) {
 			// QRCode 变成异步到达：用户点得快、或全部镜像都失败时它可能缺席。
 			// 不挡一下，下面 QRCode.CorrectLevel 会抛 ReferenceError 把整个弹窗流程打断。
@@ -23729,18 +26832,45 @@
 				showToast('二维码组件加载失败，请检查网络后刷新重试', 'error');
 				return;
 			}
-			const text = document.getElementById(elementId).value;
-			const container = document.getElementById('qrcodeContainer');
-			container.innerHTML = '';
+
+			const source = document.getElementById(elementId);
+			if (!source) return;
+
+			const text = source.value || '';
+			const meta = QRCODE_META[elementId] || { label: '订阅链接', sub: '扫码导入到客户端' };
+			qrcodeSourceId = elementId;
+
+			resetQRCodeModal();
+			document.getElementById('qrcodeTitle').textContent = '扫码导入';
+			document.getElementById('qrcodeSubtitle').textContent = meta.sub;
+			document.getElementById('qrcodeChipType').textContent = meta.label;
+			document.getElementById('qrcodeChipLen').textContent =
+				text.length.toLocaleString('zh-CN') + ' 字符';
 
 			// 如果文本过长，使用较低的纠错等级来支持更长的内容
 			let correctLevel = QRCode.CorrectLevel.H;
+			let levelLabel = '纠错 高';
 			if (text.length > 1500) {
 				correctLevel = QRCode.CorrectLevel.M;
+				levelLabel = '纠错 中';
 			}
 			if (text.length > 2500) {
 				correctLevel = QRCode.CorrectLevel.L;
+				levelLabel = '纠错 低 · 请靠近扫描';
 			}
+
+			const levelChip = document.getElementById('qrcodeChipLevel');
+			levelChip.textContent = levelLabel;
+			// 降级时切琥珀告警，与「静默降纠错」的老行为区分开
+			levelChip.classList.toggle('is-mute', text.length <= 1500);
+			levelChip.classList.toggle('is-warn', text.length > 1500);
+
+			document.getElementById('qrcodeHint').textContent = text.length > 1500
+				? '内容较长，扫描时请保持手机稳定、镜头贴近'
+				: '用手机相机，或在客户端内「扫一扫」导入';
+
+			const container = document.getElementById('qrcodeContainer');
+			container.innerHTML = '';
 
 			try {
 				new QRCode(container, {
@@ -23751,13 +26881,14 @@
 					colorLight: '#fff',
 					correctLevel: correctLevel
 				});
-				document.getElementById('qrcodeModal').classList.add('show');
 			} catch (error) {
-				// 如果文本过长，显示错误提示
+				// 超出物理容量：降到错误态，但弹窗照常打开，
+				// 让用户知道原因、并明确指向输入框旁的「复制订阅」（老实现只弹 toast、窗口根本不出现）
 				console.error('二维码生成失败:', error);
-				showToast('链接过长，无法生成二维码。联系项目作者修复问题。', 'error');
-				container.innerHTML = '<div style="padding:20px;text-align:center;color:#f44336;">二维码生成失败：内容过长</div>';
+				renderQRCodeError(text.length);
 			}
+
+			document.getElementById('qrcodeModal').classList.add('show');
 		}
 
 		function closeQRCode(event) {
@@ -24889,9 +28020,9 @@
 		function saveModuleStates() {
 			const states = {};
 			document.querySelectorAll('.module').forEach((module, index) => {
-				const title = module.querySelector('.module-title')?.textContent?.trim() || ('module-' + index);
+				const title = module.querySelector('.module-label')?.textContent?.trim() || module.querySelector('.module-title')?.textContent?.trim() || ('module-' + index);
 				// 不保存"查看操作日志"和"当前网络信息"模块的状态
-				if (title !== '📋 查看操作日志' && title !== '🌍 当前网络信息' && module.id !== 'preferredSubscriptionModule') {
+				if (title !== '查看操作日志' && title !== '当前网络信息' && module.id !== 'preferredSubscriptionModule') {
 					states[title] = !module.classList.contains('collapsed');
 				}
 			});
@@ -24907,13 +28038,13 @@
 			const isFirstVisit = !savedStates;
 
 			document.querySelectorAll('.module').forEach((module, index) => {
-				const title = module.querySelector('.module-title')?.textContent?.trim() || ('module-' + index);
+				const title = module.querySelector('.module-label')?.textContent?.trim() || module.querySelector('.module-title')?.textContent?.trim() || ('module-' + index);
 				let shouldBeExpanded;
 
 				// "查看操作日志"模块始终保持折叠状态，"当前网络信息"模块始终展开
-				if (title === '📋 查看操作日志') {
+				if (title === '查看操作日志') {
 					shouldBeExpanded = false;
-				} else if (title === '🌍 当前网络信息') {
+				} else if (title === '当前网络信息') {
 					shouldBeExpanded = true;
 				} else if (module.id === 'preferredSubscriptionModule') {
 					shouldBeExpanded = true;
@@ -30309,7 +33440,6 @@
 				customIPsEditor.addEventListener('blur', () => applyFullWidthCharSanitize(true));
 			}
 			initNodeUUIDEasterEgg();
-			initVersionCopyEasterEgg();
 			// PROXYIP 预设下拉（自绘面板）：绑定开合/选中/键盘导航
 			initProxyIPPresetPicker();
 			// ECH 的两个预设下拉（与 PROXYIP 同款自绘面板）：渲染条目并绑定开合/选中/键盘导航
